@@ -1,42 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strjoin.c                                       :+:      :+:    :+:   */
+/*   ft_strndup.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/11/06 13:38:36 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/08 17:36:44 by ncolliau         ###   ########.fr       */
+/*   Created: 2015/01/08 16:51:52 by ncolliau          #+#    #+#             */
+/*   Updated: 2015/01/08 18:19:29 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-char	*ft_strjoin(char const *s1, char const *s2)
+char	*ft_strndup(const char *s, size_t length)
 {
-	char	*str;
-	int		i;
-	int		j;
+	char	*cpy;
+	size_t	i;
 
-	if (s1 == NULL && s2 == NULL)
-		return (NULL);
-	if (s1 == NULL)
-		return (ft_strdup(s2));
-	if (s2 == NULL)
-		return (ft_strdup(s1));
-	i = -1;
-	j = 0;
-	str = malloc((ft_strlen(s1) + ft_strlen(s2) + 1) * sizeof(char));
-	if (str == NULL)
-		return (NULL);
-	while (s1[++i])
-		str[i] = s1[i];
-	while (s2[j])
+	i = 0;
+	if (length > ft_strlen(s))
+		length = ft_strlen(s);
+	cpy = (char *)malloc((length + 1) * sizeof(char));
+	while (i != length)
 	{
-		str[i] = s2[j];
+		cpy[i] = s[i];
 		i++;
-		j++;
 	}
-	str[i] = '\0';
-	return (str);
+	cpy[i] = '\0';
+	return (cpy);
 }

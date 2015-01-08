@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/03 14:57:01 by ncolliau          #+#    #+#             */
-/*   Updated: 2014/12/31 10:53:49 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/05 15:54:01 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,11 +43,11 @@ int ft_atoi(const char *str)
 		i++;
 	if (str[i] == '-' || str[i] == '+')
 	{
-		signe = (str[i] - 44) * -1;
+		signe = 44 - str[i];
 		i++;
 	}
-	if (check_number(str + i, "2147483648") < 0)
-		return (0);
+	if (check_number(str + i, "9223372036854775808") <= 0)
+		return (signe == 1) ? -1 : 0;
 	while (str[i] >= '0' && str[i] <= '9')
 	{
 		num = num * 10 + signe * (str[i] - '0');
