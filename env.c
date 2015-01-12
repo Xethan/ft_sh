@@ -1,19 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_putnbr_nl.c                                     :+:      :+:    :+:   */
+/*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/01/08 20:12:58 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/09 13:53:40 by ncolliau         ###   ########.fr       */
+/*   Created: 2015/01/12 15:32:34 by ncolliau          #+#    #+#             */
+/*   Updated: 2015/01/12 15:33:27 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "ft_sh1.h"
 
-void	ft_putnbr_nl(int nbr)
+void	disp_env(char **env, t_env var)
 {
-	ft_putnbr(nbr);
-	ft_putchar('\n');
+	int		i;
+
+	i = 0;
+	while (i != var.sz)
+	{
+		ft_putendl(env[i]);
+		i++;
+	}
 }

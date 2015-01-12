@@ -6,17 +6,17 @@
 #    By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2014/12/14 11:02:20 by ncolliau          #+#    #+#              #
-#    Updated: 2015/01/07 17:25:36 by ncolliau         ###   ########.fr        #
+#    Updated: 2015/01/12 16:06:31 by ncolliau         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = ft_minishell1
 
-OBJ = ft_sh1.o get_next_line.o
+OBJ = ft_sh1.o env.o cd.o get_next_line.o
 
 PATH_INCLUDES = includes/
 
-INCLUDES_NAME = ft_sh1.h get_next_line.h
+INCLUDES_NAME = ft_sh1.h get_next_line.h libft.h
 
 INCLUDES = $(addprefix $(PATH_INCLUDES),$(INCLUDES_NAME))
 

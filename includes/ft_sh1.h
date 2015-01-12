@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:56:19 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/07 19:28:45 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/12 15:50:52 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,15 @@
 typedef struct	s_env
 {
 	char		**path;
+	int			nb_path;
 	char		*home;
 	char		*user;
+	int			sz;
 }				t_env;
+
+void			disp_env(char **env, t_env var);
+
+
+void			change_dir(char **arg, t_env var);
 
 #endif
