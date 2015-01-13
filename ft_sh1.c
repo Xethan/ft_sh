@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:55:27 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/12 16:12:39 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/13 15:36:09 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,11 @@ void	disp_cmd_line(t_env var)
 
 	dir = NULL;
 	dir = getcwd(dir, 0);
-	ft_putstr(var.user);
+	ft_putstr(C_MAGENTA);
+	ft_putstr("var.user");
+	ft_putstr(C_NONE);
 	ft_putstr(" in ");
+	ft_putstr(C_CYAN);
 	if (ft_strstr(dir, var.home))
 	{
 		tmp = dir;
@@ -30,28 +33,35 @@ void	disp_cmd_line(t_env var)
 	}
 	ft_putstr(dir);
 	ft_putstr(" > ");
+	ft_putstr(C_NONE);
 }
 
-int		built_in(char **cmd, char **env, t_env var, pid_t father)
+int		built_in(char **cmd, t_env *var, pid_t father)
 {
 	if (ft_strequ(cmd[0], "exit"))
 		kill(father, SIGINT); // Check return
 	if (ft_strequ(cmd[0], "cd"))
 	{
-		change_dir(cmd, var);
+		change_dir(cmd, *var);
 		return (1);
 	}
 	if (ft_strequ(cmd[0], "env"))
 	{
-		disp_env(env, var);
+		ft_env(*var);
 		return (1);
 	}
 	if (ft_strequ(cmd[0], "setenv"))
 	{
+		if (cmd[1])
+			*var = ft_setenv(cmd, *var);
 		return (1);
 	}
 	if (ft_strequ(cmd[0], "unsetenv"))
 	{
+		if (cmd[1])
+			*var = ft_unsetenv(cmd[1], *var);
+		else
+			ft_putendl_fd("unsetenv: Not enough arguments", 2);
 		return (1);
 	}
 	return (0);
@@ -69,7 +79,7 @@ int		exec_cmd(char **arg, char *path)
 	return (-1);
 }
 
-void	shell(pid_t father, char **env, t_env var)
+t_env	shell(pid_t father, t_env var)
 {
 	char	**arg;
 	char	*line;
@@ -80,17 +90,18 @@ void	shell(pid_t father, char **env, t_env var)
 	get_next_line(0, &line);
 	arg = ft_strsplit(line, ' ');
 	free(line);
-	if (built_in(arg, env, var, father) == 1)
-		return ;
+	if (built_in(arg, &var, father) == 1)
+		return (var);
 	while (i != var.nb_path)
 	{
 		if (exec_cmd(arg, var.path[i]) == 1)
-			return ;
+			return (var);
 		i++;
 	}
 	ft_putstr_fd("ft_sh1: Command not found: ", 2);
 	ft_putendl_fd(arg[0], 2);
 	free(arg);
+	return (var);
 }
 
 int		get_nb_path(char *path)
@@ -116,6 +127,7 @@ int		main(int ac, char **av, char **env)
 
 	(void)ac;
 	(void)av;
+	var.env = env;
 	var.sz = 0;
 	while (env && env[var.sz])
 	{
@@ -136,7 +148,7 @@ int		main(int ac, char **av, char **env)
 		if (father > 0)
 			wait(NULL);
 		if (father == 0)
-			shell(father, env, var);
+			var = shell(father, var);
 	}
 	return (0);
 }
