@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strsplit.c                                      :+:      :+:    :+:   */
+/*   ft_sizesplit.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/07 10:08:37 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/14 13:37:26 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/14 15:30:25 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-char	**ft_strsplit(char const *s, char c)
+char	**ft_sizesplit(char const *s, char c, size_t *size)
 {
 	char	**map;
 	size_t	i;
@@ -34,5 +34,6 @@ char	**ft_strsplit(char const *s, char c)
 			i++;
 		nb_words++;
 	}
+	*size = nb_words;
 	return (map);
 }

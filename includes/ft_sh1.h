@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:56:19 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/13 15:34:51 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/14 16:34:32 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,17 +32,20 @@
 typedef struct	s_env
 {
 	char		**path;
-	int			nb_path;
+	size_t		nb_path;
 	char		*home;
 	char		*user;
 	char		**env;
-	int			sz;
+	size_t		sz;
+	char		*pwd;
+	char		*old_pwd;
 }				t_env;
 
+char			*find_env(char *str, char **env);
 void			ft_env(t_env var);
 t_env			ft_setenv(char **arg, t_env var);
 t_env			ft_unsetenv(char *to_del, t_env var);
 
-void			change_dir(char **arg, t_env var);
+void			change_dir(char **arg, t_env var, size_t sz_arg);
 
 #endif

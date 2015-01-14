@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:55:27 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/13 15:36:09 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/14 15:54:45 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,9 @@ void	disp_cmd_line(t_env var)
 
 	dir = NULL;
 	dir = getcwd(dir, 0);
+	var.pwd = ft_strdup(dir);
 	ft_putstr(C_MAGENTA);
-	ft_putstr("var.user");
+	ft_putstr(var.user);
 	ft_putstr(C_NONE);
 	ft_putstr(" in ");
 	ft_putstr(C_CYAN);
@@ -32,17 +33,18 @@ void	disp_cmd_line(t_env var)
 		ft_putstr("~");
 	}
 	ft_putstr(dir);
-	ft_putstr(" > ");
 	ft_putstr(C_NONE);
+	ft_putstr(" > ");
+	//free(dir);
 }
 
-int		built_in(char **cmd, t_env *var, pid_t father)
+int		built_in(char **cmd, t_env *var, size_t sz_arg, pid_t father)
 {
 	if (ft_strequ(cmd[0], "exit"))
 		kill(father, SIGINT); // Check return
 	if (ft_strequ(cmd[0], "cd"))
 	{
-		change_dir(cmd, *var);
+		change_dir(cmd, *var, sz_arg);
 		return (1);
 	}
 	if (ft_strequ(cmd[0], "env"))
@@ -83,21 +85,23 @@ t_env	shell(pid_t father, t_env var)
 {
 	char	**arg;
 	char	*line;
-	int		i;
+	size_t	i;
+	size_t	sz_arg;
 
 	i = 0;
 	disp_cmd_line(var);
 	get_next_line(0, &line);
-	arg = ft_strsplit(line, ' ');
+	arg = ft_sizesplit(line, ' ', &sz_arg);
 	free(line);
-	if (built_in(arg, &var, father) == 1)
+	if (built_in(arg, &var, sz_arg, father) == 1)
 		return (var);
-	while (i != var.nb_path)
+	while (i != var.nb_path && sz_arg != 0)
 	{
 		if (exec_cmd(arg, var.path[i]) == 1)
 			return (var);
 		i++;
 	}
+	execve(arg[0], arg, NULL);
 	ft_putstr_fd("ft_sh1: Command not found: ", 2);
 	ft_putendl_fd(arg[0], 2);
 	free(arg);
@@ -132,16 +136,14 @@ int		main(int ac, char **av, char **env)
 	while (env && env[var.sz])
 	{
 		if (ft_strnequ(env[var.sz], "PATH", 4))
-		{
-			var.path = ft_strsplit(env[var.sz] + 5, ':');
-			var.nb_path = get_nb_path(env[var.sz]);
-		}
+			var.path = ft_sizesplit(env[var.sz] + 5, ':', &(var.nb_path));
 		if (ft_strnequ(env[var.sz], "HOME", 4))
-			var.home = env[var.sz] + 5;
+			var.home = ft_strdup(env[var.sz] + 5);
 		if (ft_strnequ(env[var.sz], "LOGNAME", 7))
-			var.user = env[var.sz] + 8;
+			var.user = ft_strdup(env[var.sz] + 8);
 		var.sz++;
 	}
+	var.old_pwd = ft_strdup(var.home);
 	while (1)
 	{
 		father = fork();

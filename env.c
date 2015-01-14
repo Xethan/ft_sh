@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/12 15:32:34 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/13 15:15:30 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/14 16:34:18 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,29 @@ char	**ft_restralloc_no_free(char **map, int length)
 	return (map);
 }
 
+char	*find_env(char *str, char **env)
+{
+	size_t	i;
+	char	*cmp;
+
+	i = 0;
+	while (env[i] != NULL)
+	{
+		cmp = ft_strcdup(env[i], '=');
+		if (ft_strequ(str, cmp)
+		{
+			free(cmp);
+			return (ft_strdup(env[i] + ft_strlen(str) + 1));
+		}
+		free(cmp);
+		i++;
+	}
+	return (NULL);
+}
+
 void	ft_env(t_env var)
 {
-	int		i;
+	size_t	i;
 
 	i = 0;
 	while (i != var.sz)
@@ -42,7 +62,7 @@ void	ft_env(t_env var)
 
 t_env	ft_setenv(char **arg, t_env var)
 {
-	int		i;
+	size_t	i;
 
 	i = 0;
 	while (i != var.sz && !ft_strnequ(arg[1], var.env[i], ft_strlen(arg[1])))
@@ -61,8 +81,8 @@ t_env	ft_setenv(char **arg, t_env var)
 
 t_env	ft_unsetenv(char *to_del, t_env var)
 {
-	int		i;
-	int		j;
+	size_t	i;
+	size_t	j;
 	char	**env2;
 
 	i = 0;

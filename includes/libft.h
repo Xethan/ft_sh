@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/04 13:57:05 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/13 12:06:59 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/14 15:01:50 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,8 @@ void				ft_putnbr_nl(int nbr);
 void				ft_putnbr_nl_fd(int nbr, int fd);
 void				ft_putstr(char const *s);
 void				ft_putstr_fd(char const *s, int fd);
-char				**ft_restralloc(char **map, int length);
+char				**ft_restralloc(char **map, int length, size_t size);
+char				**ft_sizesplit(char const *s, char c, size_t *size);
 char				*ft_strcat(char *s1, const char *s2);
 char				*ft_strcdup(const char *s, char c);
 char				*ft_strchr(const char *s, int c);
