@@ -6,107 +6,78 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/12 15:32:34 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/14 16:34:18 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/15 18:30:05 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_sh1.h"
 
-char	**ft_restralloc_no_free(char **map, int length)
+extern char	**g_env;
+
+void	ft_env(void)
 {
-	char	**tmp;
+	size_t	i;
+
+	i = 0;
+	while (g_env[i] != NULL)
+	{
+		ft_putendl(g_env[i]);
+		i++;
+	}
+}
+
+void	ft_setenv(char *name, char *value)
+{
 	int		i;
+	char	*tmp;
 
-	i = -1;
-	tmp = map;
-	map = (char **)malloc((length + 2) * sizeof(char*));
-	if (map == NULL)
-		return (NULL);
-	while (++i != length)
-		map[i] = tmp[i];
-	map[length + 1] = NULL;
-	return (map);
-}
-
-char	*find_env(char *str, char **env)
-{
-	size_t	i;
-	char	*cmp;
-
-	i = 0;
-	while (env[i] != NULL)
+	if ((i = nb_env(name)) != -1)
 	{
-		cmp = ft_strcdup(env[i], '=');
-		if (ft_strequ(str, cmp)
-		{
-			free(cmp);
-			return (ft_strdup(env[i] + ft_strlen(str) + 1));
-		}
-		free(cmp);
-		i++;
+		tmp = g_env[i];
+		g_env[i] = ft_strjoin(name, "=");
+		// need a free or a ft_trijoin
+		g_env[i] = ft_strjoin(g_env[i], value);
+		free(tmp);
+		return ;
 	}
-	return (NULL);
+	i = len_env();
+	g_env = ft_restralloc(g_env, i, 1);
+	g_env[i] = ft_strjoin(name, "=");
+	tmp = g_env[i];
+	g_env[i] = ft_strjoin(g_env[i], value);
+	free(tmp);
 }
 
-void	ft_env(t_env var)
+void	ft_unsetenv(char **to_del, size_t sz_arg)
 {
-	size_t	i;
-
-	i = 0;
-	while (i != var.sz)
-	{
-		ft_putendl(var.env[i]);
-		i++;
-	}
-}
-
-t_env	ft_setenv(char **arg, t_env var)
-{
-	size_t	i;
-
-	i = 0;
-	while (i != var.sz && !ft_strnequ(arg[1], var.env[i], ft_strlen(arg[1])))
-		i++;
-	if (ft_strnequ(arg[1], var.env[i], ft_strlen(arg[1])))
-		var.env[i] = ft_strjoin(ft_strndup(var.env[i], ft_strclen(var.env[i], '=') + 1), arg[2]);
-	else
-	{
-		var.env = ft_restralloc_no_free(var.env, var.sz);
-		var.env[var.sz] = ft_strjoin(arg[1], "=");
-		var.env[var.sz] = ft_strjoin(var.env[var.sz], arg[2]);
-		var.sz++;
-	}
-	return (var);
-}
-
-t_env	ft_unsetenv(char *to_del, t_env var)
-{
-	size_t	i;
+	int		i;
+	int		y;
 	size_t	j;
-	char	**env2;
+	char	**tmp;
 
-	i = 0;
 	j = 0;
-	while (i != var.sz && !ft_strnequ(to_del, var.env[i], ft_strlen(to_del)))
-		i++;
-	if (ft_strnequ(to_del, var.env[i], ft_strlen(to_del)))
+	while (j != sz_arg)
 	{
-		env2 = (char **)malloc(var.sz * sizeof(char));
-		if (env2 == NULL)
-			exit(EXIT_FAILURE);
-		env2[var.sz] = NULL;
-		while (j != i)
+		if ((i = nb_env(to_del[j])) != -1)
 		{
-			env2[j] = var.env[j];
-			j++;
+			y = len_env();
+			tmp = g_env;
+			g_env = (char **)malloc(y * sizeof(char *));
+			g_env[y - 1] = NULL;
+			y = 0;
+			while (y != i)
+			{
+				g_env[y] = tmp[y];
+				y++;
+			}
+			while (tmp[y] != NULL)
+			{
+				g_env[y] = tmp[y + 1];
+				y++;
+			}
+			free(tmp[i]);
+			free(tmp);
 		}
 		j++;
-		while (j != var.sz)
-		{
-			env2[j] = var.env[j];
-			j++;
-		}
-		var.sz--;
 	}
-	return (var);
 }

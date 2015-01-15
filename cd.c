@@ -6,16 +6,16 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/12 15:37:27 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/14 16:11:22 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/15 18:37:37 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_sh1.h"
 
-t_env	chdir_me(char *target, t_env var)
-{
-	char	*tmp;
+extern char	**g_env;
 
+void	chdir_me(char *target)
+{
 	if (chdir(target) == -1)
 	{
 		ft_putstr_fd("No such file or directory: ", 2);
@@ -23,18 +23,20 @@ t_env	chdir_me(char *target, t_env var)
 	}
 	else
 	{
-		tmp = var.old_pwd;
-		var.old_pwd = var.pwd;
-		free(tmp);
-		var.pwd = ft_strdup(target);
+		ft_setenv("OLDPWD", env("PWD"));
+		ft_setenv("PWD", target);
 	}
-	return (var);
 }
 
-void	change_dir(char **arg, t_env var, size_t sz_arg)
+void	change_dir(char **arg, size_t sz_arg)
 {
-	if (sz_arg == 1 || ft_strequ(arg[1], "~"))
-		var = chdir_me(var.home, var);
+	if (sz_arg == 1 || ft_strequ(arg[1], "~") || ft_strequ(arg[1], "--"))
+		chdir_me(env("HOME"));
+	else if (ft_strequ(arg[1], "-"))
+	{
+		ft_putendl(env("OLDPWD"));
+		chdir_me(env("OLDPWD"));
+	}
 	else if (sz_arg == 3)
 	{
 		ft_putstr_fd("cd: string not in pwd: ", 2);
@@ -43,12 +45,11 @@ void	change_dir(char **arg, t_env var, size_t sz_arg)
 	else if (sz_arg >= 4)
 		ft_putendl_fd("cd: too many arguments", 2);
 	else if (ft_strnequ(arg[1], "~", 1))
-		var = chdir_me(ft_strjoin(var.home, arg[1] + 1), var);
+		chdir_me(ft_strjoin(env("HOME"), arg[1] + 1));
 	else
 	{
 		// Check validite directory;
-		var = chdir_me(arg[1], var);
+		chdir_me(arg[1]);
 		// lstat --> No such file or directory / Is not a directory
 	}
-	//chdir_me avec message d'erreur
 }

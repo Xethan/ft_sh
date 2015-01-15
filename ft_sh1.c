@@ -6,62 +6,66 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:55:27 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/14 15:54:45 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/15 18:45:13 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_sh1.h"
 
-void	disp_cmd_line(t_env var)
+char	**g_env;
+
+void	disp_cmd_line(void)
 {
 	char	*dir;
-	char	*tmp;
 
 	dir = NULL;
 	dir = getcwd(dir, 0);
-	var.pwd = ft_strdup(dir);
 	ft_putstr(C_MAGENTA);
-	ft_putstr(var.user);
+	ft_putstr(env("USER"));
 	ft_putstr(C_NONE);
 	ft_putstr(" in ");
 	ft_putstr(C_CYAN);
-	if (ft_strstr(dir, var.home))
+	if (ft_strstr(dir, env("HOME")))
 	{
-		tmp = dir;
-		dir = ft_strdup(ft_strstr(dir, var.home) + ft_strlen(var.home));
-		free(tmp);
 		ft_putstr("~");
+		ft_putstr(ft_strstr(dir, env("HOME")) + ft_strlen(env("HOME")));
 	}
-	ft_putstr(dir);
+	else
+		ft_putstr(dir);
 	ft_putstr(C_NONE);
 	ft_putstr(" > ");
-	//free(dir);
+	free(dir);
 }
 
-int		built_in(char **cmd, t_env *var, size_t sz_arg, pid_t father)
+int		built_in(char **cmd, size_t sz_arg)
 {
 	if (ft_strequ(cmd[0], "exit"))
-		kill(father, SIGINT); // Check return
+	{
+		free_env();
+		exit(EXIT_SUCCESS);
+	}
 	if (ft_strequ(cmd[0], "cd"))
 	{
-		change_dir(cmd, *var, sz_arg);
+		change_dir(cmd, sz_arg);
 		return (1);
 	}
 	if (ft_strequ(cmd[0], "env"))
 	{
-		ft_env(*var);
+		ft_env();
 		return (1);
 	}
 	if (ft_strequ(cmd[0], "setenv"))
 	{
-		if (cmd[1])
-			*var = ft_setenv(cmd, *var);
+		if (sz_arg == 3)
+			ft_setenv(cmd[1], cmd[2]);
+		else
+			ft_putendl_fd("setenv: Not the right numbers of arguments", 2);
 		return (1);
 	}
 	if (ft_strequ(cmd[0], "unsetenv"))
 	{
-		if (cmd[1])
-			*var = ft_unsetenv(cmd[1], *var);
+		if (sz_arg >= 2)
+			ft_unsetenv(cmd, sz_arg);
 		else
 			ft_putendl_fd("unsetenv: Not enough arguments", 2);
 		return (1);
@@ -71,86 +75,89 @@ int		built_in(char **cmd, t_env *var, size_t sz_arg, pid_t father)
 
 int		exec_cmd(char **arg, char *path)
 {
+	pid_t	father;
+	char	*cmd;
+	t_stat	test;
+
+	cmd = ft_strjoin(path, arg[0]);
+	if (lstat(cmd, &test) == -1)
+	{
+		free(cmd);
+		return (-1);
+	}
+	father = fork();
+	if (father == 0)
+	{
+		execve(cmd, arg, NULL);
+		free(cmd);
+		return (-1);
+	}
+	if (father > 0)
+		wait(NULL);
+	free(cmd);
+	return (1);
+}
+
+int		try_all_path(char **arg)
+{
+	char	**path;
+	size_t	nb_path;
+	size_t	i;
 	char	*cmd;
 
-	path = ft_strjoin(path, "/");
-	cmd = ft_strjoin(path, arg[0]);
-	execve(cmd, arg, NULL);
-	free(cmd);
-	free(path);
+	i = 0;
+	path = ft_sizesplit(env("PATH"), ':', &nb_path);
+	while (i != nb_path)
+	{
+		cmd = ft_strjoin(path[i], "/");
+		if (exec_cmd(arg, cmd) == 1)
+		{
+			free(cmd);
+			ft_freetab(path, nb_path);
+			return (1);
+		}
+		free(cmd);
+		i++;
+	}
+	if (exec_cmd(arg, NULL) == 1)
+	{
+		ft_freetab(path, nb_path);
+		return (1);
+	}
+	ft_freetab(path, nb_path);
 	return (-1);
-}
-
-t_env	shell(pid_t father, t_env var)
-{
-	char	**arg;
-	char	*line;
-	size_t	i;
-	size_t	sz_arg;
-
-	i = 0;
-	disp_cmd_line(var);
-	get_next_line(0, &line);
-	arg = ft_sizesplit(line, ' ', &sz_arg);
-	free(line);
-	if (built_in(arg, &var, sz_arg, father) == 1)
-		return (var);
-	while (i != var.nb_path && sz_arg != 0)
-	{
-		if (exec_cmd(arg, var.path[i]) == 1)
-			return (var);
-		i++;
-	}
-	execve(arg[0], arg, NULL);
-	ft_putstr_fd("ft_sh1: Command not found: ", 2);
-	ft_putendl_fd(arg[0], 2);
-	free(arg);
-	return (var);
-}
-
-int		get_nb_path(char *path)
-{
-	int		i;
-	int		nb;
-
-	i = 0;
-	nb = 0;
-	while (path[i])
-	{
-		if (path[i] == ':')
-			nb++;
-		i++;
-	}
-	return (nb + 1);
 }
 
 int		main(int ac, char **av, char **env)
 {
-	pid_t	father;
-	t_env	var;
+	char	*line;
+	char	**arg;
+	size_t	sz_arg;
 
 	(void)ac;
 	(void)av;
-	var.env = env;
-	var.sz = 0;
-	while (env && env[var.sz])
-	{
-		if (ft_strnequ(env[var.sz], "PATH", 4))
-			var.path = ft_sizesplit(env[var.sz] + 5, ':', &(var.nb_path));
-		if (ft_strnequ(env[var.sz], "HOME", 4))
-			var.home = ft_strdup(env[var.sz] + 5);
-		if (ft_strnequ(env[var.sz], "LOGNAME", 7))
-			var.user = ft_strdup(env[var.sz] + 8);
-		var.sz++;
-	}
-	var.old_pwd = ft_strdup(var.home);
+	g_env = dup_env(env);
 	while (1)
 	{
-		father = fork();
-		if (father > 0)
-			wait(NULL);
-		if (father == 0)
-			var = shell(father, var);
+		disp_cmd_line();
+		if (get_next_line(0, &line) == -1)
+		{
+			ft_putendl_fd("Error get_next_line", 2);
+			exit(EXIT_FAILURE);
+		}
+		arg = ft_sizesplit(line, ' ', &sz_arg);
+		free(line);
+		if (sz_arg != 0)
+		{
+			if (built_in(arg, sz_arg) == 0)
+				if (try_all_path(arg) == -1)
+				{
+					ft_putstr_fd("ft_sh1: Command not found: ", 2);
+					ft_putendl_fd(arg[0], 2);
+				}
+		ft_freetab(arg, sz_arg);
+		}
 	}
+	free_env();
 	return (0);
 }

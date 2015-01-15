@@ -6,13 +6,13 @@
 #    By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2014/12/14 11:02:20 by ncolliau          #+#    #+#              #
-#    Updated: 2015/01/13 12:31:05 by ncolliau         ###   ########.fr        #
+#    Updated: 2015/01/15 18:07:16 by ncolliau         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = ft_minishell1
 
-OBJ = ft_sh1.o env.o cd.o get_next_line.o
+OBJ = ft_sh1.o env.o cd.o get_next_line.o env_tools.o
 
 PATH_INCLUDES = includes/
 

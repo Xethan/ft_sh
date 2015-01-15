@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:56:19 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/14 16:34:32 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/15 18:13:03 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,17 +17,20 @@
 # include "get_next_line.h"
 # include <unistd.h>
 # include <signal.h>
+# include <sys/stat.h>
 
-# define C_NONE         "\033[0m"
-# define C_BOLD         "\033[1m"
-# define C_BLACK        "\033[30m"
-# define C_RED          "\033[31m"
-# define C_GREEN        "\033[32m"
-# define C_BROWN        "\033[33m"
-# define C_BLUE         "\033[34m"
-# define C_MAGENTA      "\033[35m"
-# define C_CYAN         "\033[36m"
-# define C_GRAY         "\033[37m"
+# define C_NONE		"\033[0m"
+# define C_BOLD		"\033[1m"
+# define C_BLACK	"\033[30m"
+# define C_RED		"\033[31m"
+# define C_GREEN	"\033[32m"
+# define C_BROWN	"\033[33m"
+# define C_BLUE		"\033[34m"
+# define C_MAGENTA	"\033[35m"
+# define C_CYAN		"\033[36m"
+# define C_GRAY		"\033[37m"
+
+typedef struct stat	t_stat;
 
 typedef struct	s_env
 {
@@ -41,11 +44,16 @@ typedef struct	s_env
 	char		*old_pwd;
 }				t_env;
 
-char			*find_env(char *str, char **env);
-void			ft_env(t_env var);
-t_env			ft_setenv(char **arg, t_env var);
-t_env			ft_unsetenv(char *to_del, t_env var);
+void			ft_env(void);
+void			ft_setenv(char *name, char *value);
+void			ft_unsetenv(char **to_del, size_t sz_arg);
 
-void			change_dir(char **arg, t_env var, size_t sz_arg);
+void			change_dir(char **arg, size_t sz_arg);
+
+char			**dup_env(char **env);
+void			free_env(void);
+size_t			len_env(void);
+char			*env(char *str);
+int				nb_env(char *to_find);
 
 #endif
