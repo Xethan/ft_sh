@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/12 15:32:34 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/15 18:30:05 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/16 13:38:27 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,8 @@ void	ft_setenv(char *name, char *value)
 	{
 		tmp = g_env[i];
 		g_env[i] = ft_strjoin(name, "=");
-		// need a free or a ft_trijoin
+		free(tmp);
+		tmp = g_env[i];
 		g_env[i] = ft_strjoin(g_env[i], value);
 		free(tmp);
 		return ;

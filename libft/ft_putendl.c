@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/06 14:49:06 by ncolliau          #+#    #+#             */
-/*   Updated: 2014/12/02 13:51:10 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/16 13:25:19 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,7 @@
 
 void	ft_putendl(char const *s)
 {
-	if (s == NULL)
-		return ;
-	write(1, s, ft_strlen(s));
+	if (s != NULL)
+		write(1, s, ft_strlen(s));
 	ft_putchar('\n');
 }

@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:56:19 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/15 18:13:03 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/16 14:27:47 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@
 # include "get_next_line.h"
 # include <unistd.h>
 # include <signal.h>
-# include <sys/stat.h>
 
 # define C_NONE		"\033[0m"
 # define C_BOLD		"\033[1m"

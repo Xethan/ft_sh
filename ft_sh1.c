@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:55:27 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/15 18:45:13 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/16 14:42:23 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,10 +77,9 @@ int		exec_cmd(char **arg, char *path)
 {
 	pid_t	father;
 	char	*cmd;
-	t_stat	test;
 
 	cmd = ft_strjoin(path, arg[0]);
-	if (lstat(cmd, &test) == -1)
+	if (access(cmd, X_OK) == -1)
 	{
 		free(cmd);
 		return (-1);
@@ -88,7 +87,7 @@ int		exec_cmd(char **arg, char *path)
 	father = fork();
 	if (father == 0)
 	{
-		execve(cmd, arg, NULL);
+		execve(cmd, arg, g_env);
 		free(cmd);
 		return (-1);
 	}
@@ -105,8 +104,10 @@ int		try_all_path(char **arg)
 	size_t	i;
 	char	*cmd;
 
-	i = 0;
+	if (env("PATH") == NULL)
+		return (-1);
 	path = ft_sizesplit(env("PATH"), ':', &nb_path);
+	i = 0;
 	while (i != nb_path)
 	{
 		cmd = ft_strjoin(path[i], "/");
@@ -155,7 +156,7 @@ int		main(int ac, char **av, char **env)
 					ft_putstr_fd("ft_sh1: Command not found: ", 2);
 					ft_putendl_fd(arg[0], 2);
 				}
-		ft_freetab(arg, sz_arg);
+			ft_freetab(arg, sz_arg);
 		}
 	}
 	free_env();

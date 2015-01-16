@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/10 14:37:40 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/08 18:23:15 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/16 13:19:10 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ int		read_line(char **buf, int fd)
 {
 	char	buffer[BUFF_SIZE + 1];
 	int		read_bytes;
+	char	*tmp;
 
 	read_bytes = 1;
 	while (ft_strstr(*buf, "\n") == NULL && read_bytes != 0)
@@ -23,7 +24,9 @@ int		read_line(char **buf, int fd)
 		if ((read_bytes = read(fd, buffer, BUFF_SIZE)) == -1)
 			return (-1);
 		buffer[read_bytes] = '\0';
+		tmp = *buf;
 		*buf = ft_strjoin(*buf, buffer);
+		free(tmp);
 		ft_memset(buffer, 0, read_bytes);
 	}
 	return (read_bytes);

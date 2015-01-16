@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/12 15:37:27 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/15 18:37:37 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/16 14:36:44 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,17 @@ extern char	**g_env;
 
 void	chdir_me(char *target)
 {
-	if (chdir(target) == -1)
+	if (access(target, R_OK) == -1)
 	{
-		ft_putstr_fd("No such file or directory: ", 2);
+		if (access(target, F_OK) == -1)
+			ft_putstr_fd("cd: no such file or directory: ", 2);
+		else
+			ft_putstr_fd("cd: permission denied: ", 2);
+		ft_putendl_fd(target, 2);
+	}
+	else if (chdir(target) == -1)
+	{
+		ft_putstr_fd("cd: not a directory: ", 2);
 		ft_putendl_fd(target, 2);
 	}
 	else
@@ -47,9 +55,5 @@ void	change_dir(char **arg, size_t sz_arg)
 	else if (ft_strnequ(arg[1], "~", 1))
 		chdir_me(ft_strjoin(env("HOME"), arg[1] + 1));
 	else
-	{
-		// Check validite directory;
 		chdir_me(arg[1]);
-		// lstat --> No such file or directory / Is not a directory
-	}
 }
