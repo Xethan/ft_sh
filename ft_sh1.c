@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:55:27 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/16 14:42:23 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/19 16:28:46 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,7 @@ int		try_all_path(char **arg)
 	char	*cmd;
 
 	if (env("PATH") == NULL)
-		return (-1);
+		return (exec_cmd(arg, NULL));
 	path = ft_sizesplit(env("PATH"), ':', &nb_path);
 	i = 0;
 	while (i != nb_path)
