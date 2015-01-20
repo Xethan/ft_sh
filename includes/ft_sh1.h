@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:56:19 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/19 17:16:27 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/20 11:05:31 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 # include <string.h>
 # include <signal.h>
 # include <sys/stat.h>
+# include <sys/types.h>
 
 # define C_NONE		"\033[0m"
 # define C_BOLD		"\033[1m"

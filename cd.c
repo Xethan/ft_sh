@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/12 15:37:27 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/19 17:12:54 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/20 12:30:06 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,23 +22,10 @@ void	chdir_me(char *target)
 		ft_putstr_fd("cd: no such file or directory: ", 2);
 	else if (S_ISDIR(st.st_mode) == 0)
 		ft_putstr_fd("cd: not a directory: ", 2);
-	else if (S_ISRUSR(st.st_mode) == 0)
+	else if ((0400 & st.st_mode) == 0)
 		ft_putstr_fd("cd: permission denied: ", 2);
-	// if (access(target, R_OK) == -1)
-	// {
-	// 	if (access(target, W_OK) == -1)
-	// 	{
-	// 		if (access(target, F_OK) == -1)
-	// 			ft_putstr_fd("cd: no such file or directory: ", 2);
-	// 		else
-	// 			ft_putstr_fd("cd: not a directory: ", 2);
-	// 	}
-	// 	else
-	// 		ft_putstr_fd("cd: permission denied: ", 2);
-	// 	ft_putendl_fd(target, 2);
-	// }
 	else if (chdir(target) == -1)
-		(void)target;
+		(void)target; //utile si dossier linke sans droits
 	else
 	{
 		target = NULL;
