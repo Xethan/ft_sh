@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/21 11:17:16 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/21 13:08:13 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/21 16:43:01 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,8 +58,9 @@ int		exec_cmd(char **arg, char *path)
 	if (father == 0)
 	{
 		execve(cmd, arg, g_env);
-		free(cmd);
-		return (-1);
+		ft_putstr_fd("ft_sh1: exec format error: ", 2);
+		ft_putendl_fd(arg[0], 2);
+		exit(EXIT_FAILURE);
 	}
 	if (father > 0)
 		wait(NULL);
