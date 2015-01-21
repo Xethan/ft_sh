@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:55:27 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/20 14:06:44 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/21 13:51:24 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,88 +45,35 @@ int		built_in(char **cmd, size_t sz_arg)
 		exit(EXIT_SUCCESS);
 	}
 	if (ft_strequ(cmd[0], "cd"))
-	{
 		change_dir(cmd, sz_arg);
-		return (1);
-	}
-	if (ft_strequ(cmd[0], "env"))
-	{
+	else if (ft_strequ(cmd[0], "env"))
 		ft_env();
-		return (1);
-	}
-	if (ft_strequ(cmd[0], "setenv"))
+	else if (ft_strequ(cmd[0], "setenv"))
 	{
 		if (sz_arg == 3)
 			ft_setenv(cmd[1], cmd[2]);
 		else
 			ft_putendl_fd("setenv: Not the right numbers of arguments", 2);
-		return (1);
 	}
-	if (ft_strequ(cmd[0], "unsetenv"))
-	{
-		if (sz_arg >= 2)
-			ft_unsetenv(cmd, sz_arg);
-		else
-			ft_putendl_fd("unsetenv: Not enough arguments", 2);
-		return (1);
-	}
-	return (0);
-}
-
-int		exec_cmd(char **arg, char *path)
-{
-	pid_t	father;
-	char	*cmd;
-
-	cmd = ft_strjoin(path, arg[0]);
-	if (access(cmd, X_OK) == -1)
-	{
-		free(cmd);
-		return (-1);
-	}
-	father = fork();
-	if (father == 0)
-	{
-		execve(cmd, arg, g_env);
-		free(cmd);
-		return (-1);
-	}
-	if (father > 0)
-		wait(NULL);
-	free(cmd);
+	else if (ft_strequ(cmd[0], "unsetenv"))
+		ft_unsetenv(cmd, sz_arg);
+	else
+		return (0);
 	return (1);
 }
 
-int		try_all_path(char **arg)
+char	*replace_tabs(char *line)
 {
-	char	**path;
-	size_t	nb_path;
-	size_t	i;
-	char	*cmd;
+	int		i;
 
-	if (env("PATH") == NULL)
-		return (exec_cmd(arg, NULL));
-	path = ft_sizesplit(env("PATH"), ':', &nb_path);
 	i = 0;
-	while (i != nb_path)
+	while (line[i])
 	{
-		cmd = ft_strjoin(path[i], "/");
-		if (exec_cmd(arg, cmd) == 1)
-		{
-			free(cmd);
-			ft_freetab(path, nb_path);
-			return (1);
-		}
-		free(cmd);
+		if (ft_isspace(line[i]) == 1)
+			line[i] = ' ';
 		i++;
 	}
-	if (exec_cmd(arg, NULL) == 1)
-	{
-		ft_freetab(path, nb_path);
-		return (1);
-	}
-	ft_freetab(path, nb_path);
-	return (-1);
+	return (line);
 }
 
 int		main(int ac, char **av, char **env)
@@ -135,9 +82,7 @@ int		main(int ac, char **av, char **env)
 	char	**arg;
 	size_t	sz_arg;
 
-	(void)ac;
-	(void)av;
-	g_env = dup_env(env);
+	dup_env(env, ac, av);
 	while (1)
 	{
 		disp_cmd_line();
@@ -146,16 +91,13 @@ int		main(int ac, char **av, char **env)
 			ft_putendl_fd("Error get_next_line", 2);
 			exit(EXIT_FAILURE);
 		}
+		line = replace_tabs(line);
 		arg = ft_sizesplit(line, ' ', &sz_arg);
 		free(line);
 		if (sz_arg != 0)
 		{
 			if (built_in(arg, sz_arg) == 0)
-				if (try_all_path(arg) == -1)
-				{
-					ft_putstr_fd("ft_sh1: Command not found: ", 2);
-					ft_putendl_fd(arg[0], 2);
-				}
+				try_all_path(arg);
 			ft_freetab(arg, sz_arg);
 		}
 	}

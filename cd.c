@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/12 15:37:27 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/20 12:30:06 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/21 12:44:50 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,18 +14,42 @@
 
 extern char	**g_env;
 
+int		check_cd_access(char *bin_path)
+{
+	char	*path;
+	int		i;
+	int		ret;
+
+	i = 0;
+	ret = 1;
+	while (bin_path[i])
+		i++;
+	while (bin_path[i] != '/' && i != 0)
+		i--;
+	path = ft_strndup(bin_path, i);
+	if (access(path, F_OK) == -1 && i != 0)
+		ret = -1;
+	else if (access(path, R_OK) == -1 && i != 0)
+		ret = -2;
+	else if (access(bin_path, F_OK) == -1)
+		ret = -1;
+	else if (access(bin_path, R_OK) == -1)
+		ret = -2;
+	free(path);
+	return (ret);
+}
+
 void	chdir_me(char *target)
 {
-	t_stat	st;
+	int		ret;
 
-	if (stat(target, &st) == -1)
-		ft_putstr_fd("cd: no such file or directory: ", 2);
-	else if (S_ISDIR(st.st_mode) == 0)
-		ft_putstr_fd("cd: not a directory: ", 2);
-	else if ((0400 & st.st_mode) == 0)
+	ret = check_cd_access(target);
+	if (ret == -2)
 		ft_putstr_fd("cd: permission denied: ", 2);
+	else if (ret == -1)
+		ft_putstr_fd("cd: no such file or directory: ", 2);
 	else if (chdir(target) == -1)
-		(void)target; //utile si dossier linke sans droits
+		ft_putstr_fd("cd: not a directory: ", 2);
 	else
 	{
 		target = NULL;

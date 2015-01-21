@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/15 16:54:52 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/15 18:11:42 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/21 13:51:17 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,19 +14,20 @@
 
 extern char	**g_env;
 
-char	**dup_env(char **env)
+void	dup_env(char **env, int ac, char **av)
 {
-	char	**cpy;
 	int		i;
 
+	(void)ac;
+	(void)av;
 	i = 0;
 	while (env[i] != NULL)
 		i++;
-	cpy = (char **)malloc((i + 1) * sizeof(char *));
-	cpy[i] = NULL;
+	g_env = (char **)malloc((i + 1) * sizeof(char *));
+	g_env[i] = NULL;
 	while (i-- != 0)
-		cpy[i] = ft_strdup(env[i]);
-	return (cpy);
+		g_env[i] = ft_strdup(env[i]);
+	up_shlvl();
 }
 
 void	free_env(void)

@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:56:19 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/20 11:05:31 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/21 13:51:32 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,13 +47,19 @@ typedef struct	s_env
 	char		*old_pwd;
 }				t_env;
 
+int				check_access(char *bin_path);
+int				exec_cmd(char **arg, char *path);
+void			try_all_path(char **arg);
+
+void			up_shlvl(void);
 void			ft_env(void);
 void			ft_setenv(char *name, char *value);
 void			ft_unsetenv(char **to_del, size_t sz_arg);
 
+void			chdir_me(char *target);
 void			change_dir(char **arg, size_t sz_arg);
 
-char			**dup_env(char **env);
+void			dup_env(char **env, int ac, char **av);
 void			free_env(void);
 size_t			len_env(void);
 char			*env(char *str);

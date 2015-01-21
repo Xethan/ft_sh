@@ -6,13 +6,28 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/12 15:32:34 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/20 11:01:12 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/21 12:35:15 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_sh1.h"
 
 extern char	**g_env;
+
+void	up_shlvl(void)
+{
+	int		i;
+	int		nbr;
+	char	*lvl;
+
+	if ((i = nb_env("SHLVL")) == -1)
+		nbr = 1;
+	else
+		nbr = ft_atoi(g_env[i] + ft_strclen(g_env[i], '=') + 1) + 1;
+	lvl = ft_itoa(nbr);
+	ft_setenv("SHLVL", lvl);
+	free(lvl);
+}
 
 void	ft_env(void)
 {
@@ -49,36 +64,46 @@ void	ft_setenv(char *name, char *value)
 	free(tmp);
 }
 
+void	get_env_less_one(int to_del)
+{
+	char	**tmp;
+	int		len;
+	int		i;
+
+	tmp = g_env;
+	len = len_env();
+	g_env = (char **)malloc(len * sizeof(char *));
+	g_env[len - 1] = NULL;
+	i = 0;
+	while (i != to_del)
+	{
+		g_env[i] = tmp[i];
+		i++;
+	}
+	while (tmp[i] != NULL)
+	{
+		g_env[i] = tmp[i + 1];
+		i++;
+	}
+	free(tmp[to_del]);
+	free(tmp);
+}
+
 void	ft_unsetenv(char **to_del, size_t sz_arg)
 {
-	int		i;
-	int		y;
-	size_t	j;
-	char	**tmp;
+	size_t	i;
+	int		del;
 
-	j = 0;
-	while (j != sz_arg)
+	i = 0;
+	if (sz_arg <= 1)
 	{
-		if ((i = nb_env(to_del[j])) != -1)
-		{
-			y = len_env();
-			tmp = g_env;
-			g_env = (char **)malloc(y * sizeof(char *));
-			g_env[y - 1] = NULL;
-			y = 0;
-			while (y != i)
-			{
-				g_env[y] = tmp[y];
-				y++;
-			}
-			while (tmp[y] != NULL)
-			{
-				g_env[y] = tmp[y + 1];
-				y++;
-			}
-			free(tmp[i]);
-			free(tmp);
-		}
-		j++;
+		ft_putendl_fd("unsetenv: Not enough arguments", 2);
+		return ;
+	}
+	while (i != sz_arg)
+	{
+		if ((del = nb_env(to_del[i])) != -1)
+			get_env_less_one(del);
+		i++;
 	}
 }
