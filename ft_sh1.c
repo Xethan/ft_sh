@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:55:27 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/21 13:51:24 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/22 12:00:27 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ int		built_in(char **cmd, size_t sz_arg)
 	if (ft_strequ(cmd[0], "exit"))
 	{
 		free_env();
+		ft_freetab(cmd, sz_arg);
 		exit(EXIT_SUCCESS);
 	}
 	if (ft_strequ(cmd[0], "cd"))
