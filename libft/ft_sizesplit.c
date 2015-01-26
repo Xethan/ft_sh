@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/07 10:08:37 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/20 14:07:00 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/24 15:34:24 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,10 @@ char	**ft_sizesplit(char const *s, char c, size_t *size)
 	size_t	nb_words;
 
 	if (s == NULL)
+	{
+		*size = 0;
 		return (NULL);
+	}
 	i = 0;
 	nb_words = 0;
 	while (s[i] && s[i] == c)

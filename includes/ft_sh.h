@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_sh1.h                                           :+:      :+:    :+:   */
+/*   ft_sh.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:56:19 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/21 13:51:32 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/26 15:22:31 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_SH1_H
-# define FT_SH1_H
+#ifndef FT_SH_H
+# define FT_SH_H
 
 # include "libft.h"
 # include "get_next_line.h"
@@ -62,7 +62,7 @@ void			change_dir(char **arg, size_t sz_arg);
 void			dup_env(char **env, int ac, char **av);
 void			free_env(void);
 size_t			len_env(void);
-char			*env(char *str);
+char			*find_env(char *str);
 int				nb_env(char *to_find);
 
 #endif

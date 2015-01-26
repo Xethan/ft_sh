@@ -6,11 +6,11 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/21 11:17:16 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/21 16:43:01 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/26 15:32:31 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_sh1.h"
+#include "ft_sh.h"
 
 extern char **g_env;
 
@@ -31,7 +31,7 @@ int		check_access(char *full_path)
 	bin_path = ft_strndup(full_path, i);
 	if (i != 0 && stat(bin_path, &st) == -1)
 		ret = -1;
-	else if (access(bin_path, R_OK) == -1 && i != 0)
+	else if (i != 0 && access(bin_path, R_OK) == -1)
 		ret = -2;
 	else if (stat(full_path, &st2) == -1)
 		ret = -1;
@@ -74,6 +74,8 @@ int		try_regular_path(char **path, size_t nb_path, char **arg)
 	char	*cmd;
 	int		ret;
 
+	if (nb_path == 0)
+		return (-1);
 	i = 0;
 	while (i != nb_path)
 	{
@@ -93,19 +95,16 @@ void	try_all_path(char **arg)
 	size_t	nb_path;
 	int		ret;
 
-	ret = -1;
-	path = ft_sizesplit(env("PATH"), ':', &nb_path);
-	if (env("PATH") != NULL)
+	path = ft_sizesplit(find_env("PATH"), ':', &nb_path);
+	if (arg[0][0] != '.' && arg[0][0] != '/')
 		ret = try_regular_path(path, nb_path, arg);
-	if (ret != 1)
-	{
+	else
 		ret = exec_cmd(arg, NULL);
-		if (ret == -2)
-			ft_putstr_fd("ft_sh1: permission denied: ", 2);
-		if (ret == -1)
-			ft_putstr_fd("ft_sh1: command not found: ", 2);
-		if (ret != 1)
-			ft_putendl_fd(arg[0], 2);
-	}
+	if (ret == -2)
+		ft_putstr_fd("ft_sh1: permission denied: ", 2);
+	if (ret == -1)
+		ft_putstr_fd("ft_sh1: command not found: ", 2);
+	if (ret != 1)
+		ft_putendl_fd(arg[0], 2);
 	ft_freetab(path, nb_path);
 }

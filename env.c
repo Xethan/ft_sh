@@ -6,11 +6,11 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/12 15:32:34 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/21 12:35:15 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/24 16:56:20 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_sh1.h"
+#include "ft_sh.h"
 
 extern char	**g_env;
 

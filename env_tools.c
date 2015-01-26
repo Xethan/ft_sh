@@ -6,11 +6,11 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/15 16:54:52 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/21 13:51:17 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/26 15:18:06 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_sh1.h"
+#include "ft_sh.h"
 
 extern char	**g_env;
 
@@ -53,7 +53,7 @@ size_t	len_env(void)
 	return (i);
 }
 
-char	*env(char *str)
+char	*find_env(char *str)
 {
 	size_t	i;
 	char	*cmp;
