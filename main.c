@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:55:27 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/26 15:35:04 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/28 15:02:41 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,52 +61,6 @@ int		built_in(char **cmd, size_t sz_arg)
 	else
 		return (0);
 	return (1);
-}
-
-char	*replace_tabs(char *line)
-{
-	int		i;
-
-	i = 0;
-	while (line[i])
-	{
-		if (ft_isspace(line[i]) == 1)
-			line[i] = ' ';
-		i++;
-	}
-	return (line);
-}
-
-void	treat_cmd(char **arg, size_t sz_arg)
-{
-	size_t	i;
-	size_t	j;
-	char	**cmd;
-	size_t	sz_cmd;
-
-	i = 0;
-	while (i != sz_arg)
-	{
-		arg[i] = replace_tabs(arg[i]);
-		cmd = ft_sizesplit(arg[i], ' ', &sz_cmd);
-		j = 0;
-		while (j != sz_cmd)
-		{
-			if (cmd[j][0] == '~' && (cmd[j][1] == '\0' || cmd[j][1] == '/') && find_env("HOME") != NULL)
-				cmd[j] = ft_strjoin(find_env("HOME"), cmd[j] + 1); // need a free
-			j++;
-		}
-		if (sz_cmd != 0)
-		{
-			if (built_in(cmd, sz_cmd) == 0)
-				try_all_path(cmd);
-			ft_freetab(cmd, sz_cmd);
-		}
-		free(arg[i]);
-		i++;
-		if (i == sz_arg)
-			free(arg);
-	}
 }
 
 int		main(int ac, char **av, char **env)

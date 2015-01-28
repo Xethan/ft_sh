@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:56:19 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/26 15:22:31 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/28 18:41:53 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,36 +33,43 @@
 # define C_CYAN		"\033[36m"
 # define C_GRAY		"\033[37m"
 
+# define WRITE_END	1
+# define READ_END	0
+
 typedef struct stat	t_stat;
 
-typedef struct	s_env
+typedef struct		s_arg
 {
-	char		**path;
-	size_t		nb_path;
-	char		*home;
-	char		*user;
-	char		**env;
-	size_t		sz;
-	char		*pwd;
-	char		*old_pwd;
-}				t_env;
+	char			**arg;
+	size_t			sz_arg;
+	char			*redir;
+	struct	s_arg	*next;
+}					t_arg;
 
-int				check_access(char *bin_path);
-int				exec_cmd(char **arg, char *path);
-void			try_all_path(char **arg);
+int					built_in(char **cmd, size_t sz_arg);
 
-void			up_shlvl(void);
-void			ft_env(void);
-void			ft_setenv(char *name, char *value);
-void			ft_unsetenv(char **to_del, size_t sz_arg);
+void				treat_cmd(char **arg, size_t sz_arg);
 
-void			chdir_me(char *target);
-void			change_dir(char **arg, size_t sz_arg);
+int					check_access(char *bin_path);
+int					exec_cmd(char **arg, char *path);
+void				try_all_path(char **arg);
 
-void			dup_env(char **env, int ac, char **av);
-void			free_env(void);
-size_t			len_env(void);
-char			*find_env(char *str);
-int				nb_env(char *to_find);
+t_arg				*lstnew(char **arg, size_t sz_arg, char *redir);
+void				lst_creat_after(t_arg *list, char **arg, size_t sz_arg, char *redir);
+void				lstdel(t_arg **begin_list);
+
+void				up_shlvl(void);
+void				ft_env(void);
+void				ft_setenv(char *name, char *value);
+void				ft_unsetenv(char **to_del, size_t sz_arg);
+
+void				chdir_me(char *target);
+void				change_dir(char **arg, size_t sz_arg);
+
+void				dup_env(char **env, int ac, char **av);
+void				free_env(void);
+size_t				len_env(void);
+char				*find_env(char *str);
+int					nb_env(char *to_find);
 
 #endif

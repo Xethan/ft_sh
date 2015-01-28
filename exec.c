@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/21 11:17:16 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/26 15:32:31 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/28 13:59:23 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,9 +44,15 @@ int		check_access(char *full_path)
 int		exec_cmd(char **arg, char *path)
 {
 	pid_t	father;
+	pid_t	child;
 	char	*cmd;
 	int		ret;
+	int		pdes[2];
+	char	*arg2[3];
 
+	arg2[0] = "/bin/cat";
+	arg2[1] = "-e";
+	arg2[2] = NULL;
 	cmd = ft_strjoin(path, arg[0]);
 	ret = check_access(cmd);
 	if (ret != 1)
@@ -54,13 +60,27 @@ int		exec_cmd(char **arg, char *path)
 		free(cmd);
 		return (ret);
 	}
-	father = fork();
-	if (father == 0)
+	child = fork();
+	if (child == 0)
 	{
-		execve(cmd, arg, g_env);
-		ft_putstr_fd("ft_sh1: exec format error: ", 2);
-		ft_putendl_fd(arg[0], 2);
-		exit(EXIT_FAILURE);
+		pipe(pdes);
+		father = fork();
+		if (father == 0)
+		{
+			dup2(pdes[WRITE_END], STDOUT_FILENO);
+			close(pdes[READ_END]);
+			execve(cmd, arg, g_env);
+			ft_putstr_fd("ft_sh1: exec format error: ", 2);
+			ft_putendl_fd(arg[0], 2);
+			exit(EXIT_FAILURE);
+		}
+		if (father > 0)
+		{
+			wait(NULL);
+			dup2(pdes[READ_END], STDIN_FILENO);
+			close(pdes[WRITE_END]);
+			execve(arg2[0], arg2, g_env);
+		}
 	}
 	if (father > 0)
 		wait(NULL);
@@ -75,7 +95,7 @@ int		try_regular_path(char **path, size_t nb_path, char **arg)
 	int		ret;
 
 	if (nb_path == 0)
-		return (-1);
+		return (0);
 	i = 0;
 	while (i != nb_path)
 	{
@@ -86,7 +106,7 @@ int		try_regular_path(char **path, size_t nb_path, char **arg)
 			return (ret);
 		i++;
 	}
-	return (-1);
+	return (0);
 }
 
 void	try_all_path(char **arg)
@@ -102,8 +122,10 @@ void	try_all_path(char **arg)
 		ret = exec_cmd(arg, NULL);
 	if (ret == -2)
 		ft_putstr_fd("ft_sh1: permission denied: ", 2);
-	if (ret == -1)
+	if (ret == 0)
 		ft_putstr_fd("ft_sh1: command not found: ", 2);
+	if (ret == -1)
+		ft_putstr_fd("ft_sh1: no such file or directory: ", 2);
 	if (ret != 1)
 		ft_putendl_fd(arg[0], 2);
 	ft_freetab(path, nb_path);

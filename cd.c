@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/12 15:37:27 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/26 15:30:45 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/27 12:23:04 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ void	chdir_me(char *target)
 
 void	change_dir(char **arg, size_t sz_arg)
 {
-	if (sz_arg == 1 || ft_strequ(arg[1], "~") || ft_strequ(arg[1], "--"))
+	if (sz_arg == 1 || ft_strequ(arg[1], "--"))
 		chdir_me(find_env("HOME"));
 	else if (ft_strequ(arg[1], "-"))
 	{
