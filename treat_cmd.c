@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/28 15:01:51 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/28 19:04:54 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/31 18:38:08 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ int		is_redir(char *s)
 	return (0);
 }
 
-t_arg	**cmd_to_list(char *cmd)
+t_arg	*cmd_to_list(char *cmd)
 {
 	int		i;
 	int		j;
@@ -82,12 +82,12 @@ t_arg	**cmd_to_list(char *cmd)
 	char	**arg;
 	size_t	sz_arg;
 	char	*redir;
-	t_arg	**begin_list;
+	t_arg	*blst;
 	t_arg	*plist;
 
 	i = 0;
 	j = 0;
-	begin_list = NULL;
+	blst = NULL;
 	while (cmd[i])
 	{
 		redir = NULL;
@@ -101,11 +101,11 @@ t_arg	**cmd_to_list(char *cmd)
 			j++;
 		tmp = ft_strsub(cmd, i, j);
 		arg = ft_sizesplit(tmp, ' ', &sz_arg);
-		if (begin_list == NULL)
+		arg = tilde_and_dollar(arg, sz_arg);
+		if (blst == NULL)
 		{
-			begin_list = (t_arg **)malloc(sizeof(t_arg*));
-			*begin_list = lstnew(arg, sz_arg, redir);
-			plist = *begin_list;
+			blst = lstnew(arg, sz_arg, redir);
+			plist = blst;
 		}
 		else
 		{
@@ -114,41 +114,25 @@ t_arg	**cmd_to_list(char *cmd)
 		}
 		i = j;
 	}
-	return (begin_list);
+	return (blst);
 }
 
 void	treat_cmd(char **arg, size_t sz_arg)
 {
 	size_t	i;
-	char	**cmd;
-	size_t	sz_cmd;
-	t_arg	**begin_list;
-	t_arg	*plist;
+	t_arg	*blst;
 
 	i = 0;
 	while (i != sz_arg)
 	{
 		arg[i] = replace_tabs(arg[i]);
-		begin_list = cmd_to_list(arg[i]);
-		plist = *begin_list;
-		while (plist != NULL)
+		blst = cmd_to_list(arg[i]);
+		if (blst != NULL)
 		{
-			ft_putendl(plist->arg[0]);
-			ft_putnbr_nl(plist->sz_arg);
-			ft_putendl(plist->redir);
-			plist = plist->next;
+			if (built_in(blst->arg, blst->sz_arg) == 0)
+				try_all_path(blst);
+			lstdel(&blst);
 		}
-		cmd = ft_sizesplit(arg[i], ' ', &sz_cmd);
-		cmd = tilde_and_dollar(cmd, sz_cmd);
-		if (sz_cmd != 0)
-		{
-			if (built_in(cmd, sz_cmd) == 0)
-				try_all_path(cmd);
-			ft_freetab(cmd, sz_cmd);
-		}
-		free(arg[i]);
 		i++;
-		if (i == sz_arg)
-			free(arg);
 	}
 }

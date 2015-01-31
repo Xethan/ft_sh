@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:56:19 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/28 18:41:53 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/31 17:24:55 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,8 @@ int					built_in(char **cmd, size_t sz_arg);
 void				treat_cmd(char **arg, size_t sz_arg);
 
 int					check_access(char *bin_path);
-int					exec_cmd(char **arg, char *path);
-void				try_all_path(char **arg);
+//int					exec_cmd(t_arg *plist, int test);
+void				try_all_path(t_arg *plist);
 
 t_arg				*lstnew(char **arg, size_t sz_arg, char *redir);
 void				lst_creat_after(t_arg *list, char **arg, size_t sz_arg, char *redir);

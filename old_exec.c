@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/21 11:17:16 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/31 18:44:54 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/01/30 15:26:08 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,51 +41,31 @@ int		check_access(char *full_path)
 	return (ret);
 }
 
-int		exec_cmd(t_arg *plist, int old_pdes[2])
+int		exec_cmd(char **arg, char *path)
 {
 	pid_t	father;
-	int		new_pdes[2];
+	char	*cmd;
+	int		ret;
 
-	if (plist->next)
-		pipe(new_pdes);
-	father = fork();
-	if (father > 0)
+	cmd = ft_strjoin(path, arg[0]);
+	ret = check_access(cmd);
+	if (ret != 1)
 	{
-		if (plist->next)
-			exec_cmd(plist->next, new_pdes);
-		else
-			wait(NULL);
+		free(cmd);
+		return (ret);
 	}
+	father = fork();
 	if (father == 0)
 	{
-		if (plist->next)
-		{
-			close(new_pdes[READ_END]);
-			dup2(new_pdes[WRITE_END], STDOUT_FILENO);
-			close(new_pdes[WRITE_END]);
-		}
-		if (old_pdes != NULL)
-		{
-			close(old_pdes[WRITE_END]);
-			dup2(old_pdes[READ_END], STDIN_FILENO);
-			close(old_pdes[READ_END]);
-		}
-		execve(plist->arg[0], plist->arg, g_env);
+		execve(cmd, arg, g_env);
 		ft_putstr_fd("ft_sh1: exec format error: ", 2);
-		ft_putendl_fd(plist->arg[0], 2);
+		ft_putendl_fd(arg[0], 2);
 		exit(EXIT_FAILURE);
 	}
+	if (father > 0)
+		wait(NULL);
+	free(cmd);
 	return (1);
-}
-
-char	*ft_strtrijoin(char *s1, char *s2, char *s3)
-{
-	char	*tmp;
-
-	tmp = ft_strjoin(s2, s3);
-	s1 = ft_strjoin(s1, tmp);
-	free(tmp);
-	return (s1);
 }
 
 int		try_regular_path(char **path, size_t nb_path, char **arg)
@@ -94,53 +74,39 @@ int		try_regular_path(char **path, size_t nb_path, char **arg)
 	char	*cmd;
 	int		ret;
 
-	if (arg[0][0] != '.' && arg[0][0] != '/')
-	{
-		if (nb_path == 0)
-			return (0);
-		i = 0;
-		while (i != nb_path)
-		{
-			cmd = ft_strtrijoin(path[i], "/", arg[0]);
-			ret = check_access(cmd);
-			if (ret == 1)
-			{
-				free(arg[0]);
-				arg[0] = ft_strdup(cmd);
-			}
-			free(cmd);
-			if (ret == 1 || ret == -2)
-				return (ret);
-			i++;
-		}	
+	if (nb_path == 0)
 		return (0);
+	i = 0;
+	while (i != nb_path)
+	{
+		cmd = ft_strjoin(path[i], "/");
+		ret = exec_cmd(arg, cmd);
+		free(cmd);
+		if (ret == 1 || ret == -2)
+			return (ret);
+		i++;
 	}
-	else
-		return (check_access(arg[0]));
+	return (0);
 }
 
-void	try_all_path(t_arg *blist)
+void	try_all_path(char **arg)
 {
-	t_arg	*plist;
 	char	**path;
 	size_t	nb_path;
 	int		ret;
 
 	path = ft_sizesplit(find_env("PATH"), ':', &nb_path);
-	plist = blist;
-	while (plist != NULL)
-	{
-		ret = try_regular_path(path, nb_path, plist->arg);
-		if (ret == -2)
-			ft_putstr_fd("ft_sh1: permission denied: ", 2);
-		if (ret == 0)
-			ft_putstr_fd("ft_sh1: command not found: ", 2);
-		if (ret == -1)
-			ft_putstr_fd("ft_sh1: no such file or directory: ", 2);
-		if (ret != 1)
-			ft_putendl_fd(plist->arg[0], 2);
-		plist = plist->next;
-	}
-	exec_cmd(blist, NULL);
+	if (arg[0][0] != '.' && arg[0][0] != '/')
+		ret = try_regular_path(path, nb_path, arg);
+	else
+		ret = exec_cmd(arg, NULL);
+	if (ret == -2)
+		ft_putstr_fd("ft_sh1: permission denied: ", 2);
+	if (ret == 0)
+		ft_putstr_fd("ft_sh1: command not found: ", 2);
+	if (ret == -1)
+		ft_putstr_fd("ft_sh1: no such file or directory: ", 2);
+	if (ret != 1)
+		ft_putendl_fd(arg[0], 2);
 	ft_freetab(path, nb_path);
 }
