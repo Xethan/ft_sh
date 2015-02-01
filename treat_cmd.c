@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/28 15:01:51 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/31 18:38:08 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/01 15:12:09 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,54 +67,64 @@ int		is_redir(char *s)
 	if (ft_strnequ(s, ">>", 2) == 1)
 		return (1);
 	if (ft_strnequ(s, "<", 1) == 1)
-		return (1);
+		return (2);
 	if (ft_strnequ(s, "<<", 2) == 1)
-		return (1);
+		return (2);
 	return (0);
+}
+
+int		get_node(char *cmd, int i, t_arg **plist)
+{
+	char	*redir;
+	char	*tmp;
+	char	**arg;
+	size_t	sz_arg;
+	int		j;
+	int		ret;
+
+	j = i;
+	redir = NULL;
+	if ((ret = is_redir(cmd + j)) != 0)
+	{
+		redir = ft_strsub(cmd, j, ret);
+		j += ret;
+		i += ret;
+	}
+	while (cmd[j] && (ret = is_redir(cmd + j)) == 0)
+		j++;
+	tmp = ft_strsub(cmd, i, j - i);
+	tmp = replace_tabs(tmp);
+	arg = ft_sizesplit(tmp, ' ', &sz_arg);
+	arg = tilde_and_dollar(arg, sz_arg);
+	if (sz_arg == 0)
+		*plist = NULL;
+	else
+		*plist = lstnew(arg, sz_arg, redir);
+	return (j);
 }
 
 t_arg	*cmd_to_list(char *cmd)
 {
 	int		i;
-	int		j;
-	int		ret;
-	char	*tmp;
-	char	**arg;
-	size_t	sz_arg;
-	char	*redir;
-	t_arg	*blst;
+	t_arg	*blist;
 	t_arg	*plist;
+	t_arg	*new_node;
 
 	i = 0;
-	j = 0;
-	blst = NULL;
+	blist = NULL;
 	while (cmd[i])
 	{
-		redir = NULL;
-		if ((ret = is_redir(cmd + j)) != 0)
+		i = get_node(cmd, i, &new_node);
+		if (new_node != NULL)
 		{
-			redir = ft_strsub(cmd, j, ret);
-			j += ret + 1;
-			i += ret + 1;
+			if (blist == NULL)
+				blist = new_node;
+			else
+				plist->next = new_node;
+			plist = new_node;
 		}
-		while (cmd[j] && (ret = is_redir(cmd + j)) == 0)
-			j++;
-		tmp = ft_strsub(cmd, i, j);
-		arg = ft_sizesplit(tmp, ' ', &sz_arg);
-		arg = tilde_and_dollar(arg, sz_arg);
-		if (blst == NULL)
-		{
-			blst = lstnew(arg, sz_arg, redir);
-			plist = blst;
-		}
-		else
-		{
-			lst_creat_after(plist, arg, sz_arg, redir);
-			plist = plist->next;
-		}
-		i = j;
 	}
-	return (blst);
+	return (blist);
 }
 
 void	treat_cmd(char **arg, size_t sz_arg)
@@ -125,7 +135,6 @@ void	treat_cmd(char **arg, size_t sz_arg)
 	i = 0;
 	while (i != sz_arg)
 	{
-		arg[i] = replace_tabs(arg[i]);
 		blst = cmd_to_list(arg[i]);
 		if (blst != NULL)
 		{

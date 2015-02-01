@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:56:19 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/31 17:24:55 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/01 17:19:14 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include "get_next_line.h"
 # include <unistd.h>
 # include <stdlib.h>
+# include <fcntl.h>
 # include <string.h>
 # include <signal.h>
 # include <sys/stat.h>
@@ -48,11 +49,12 @@ typedef struct		s_arg
 
 int					built_in(char **cmd, size_t sz_arg);
 
+t_arg				*cmd_to_list(char *cmd);
 void				treat_cmd(char **arg, size_t sz_arg);
 
 int					check_access(char *bin_path);
 //int					exec_cmd(t_arg *plist, int test);
-void				try_all_path(t_arg *plist);
+void				try_all_path(t_arg *blist);
 
 t_arg				*lstnew(char **arg, size_t sz_arg, char *redir);
 void				lst_creat_after(t_arg *list, char **arg, size_t sz_arg, char *redir);

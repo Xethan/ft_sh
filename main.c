@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:55:27 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/31 16:26:54 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/01 17:12:03 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,11 @@ int		built_in(char **cmd, size_t sz_arg)
 	return (1);
 }
 
+void	quit(int signal)
+{
+	(void)signal;
+}
+
 int		main(int ac, char **av, char **env)
 {
 	char	*line;
@@ -70,6 +75,7 @@ int		main(int ac, char **av, char **env)
 	size_t	sz_arg;
 
 	dup_env(env, ac, av);
+	signal(SIGINT, quit);
 	while (1)
 	{
 		disp_cmd_line();
@@ -81,7 +87,8 @@ int		main(int ac, char **av, char **env)
 		arg = ft_sizesplit(line, ';', &sz_arg);
 		free(line);
 		treat_cmd(arg, sz_arg);
-		ft_freetab(arg, sz_arg);
+		if (sz_arg != 0)
+			ft_freetab(arg, sz_arg);
 	}
 	free_env();
 	return (0);
