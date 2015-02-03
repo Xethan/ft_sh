@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/21 11:17:16 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/01 17:30:03 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/03 18:07:40 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,40 +64,57 @@ t_arg	*do_redir(t_arg *plist)
 
 int		exec_cmd(t_arg *plist, int old_pdes[2])
 {
-	pid_t	father;
+	pid_t	pid;
+	//pid_t	pid2;
 	int		new_pdes[2];
 
 	if (plist->next)
 		pipe(new_pdes);
-	father = fork();
-	if (father == 0)
+	pid = fork();
+	if (pid > 0)
 	{
-		//plist = do_redir(plist);
+		wait(NULL);
+		close(new_pdes[WRITE_END]);
+		if (old_pdes != NULL)
+			close(old_pdes[READ_END]);
+		if (plist->next)
+			exec_cmd(plist->next, new_pdes);
+	}
+	if (pid == 0)
+	{
 		if (plist->next)
 		{
 			close(new_pdes[READ_END]);
 			dup2(new_pdes[WRITE_END], STDOUT_FILENO);
-			close(new_pdes[WRITE_END]);
 		}
 		if (old_pdes != NULL)
 		{
 			close(old_pdes[WRITE_END]);
 			dup2(old_pdes[READ_END], STDIN_FILENO);
-			close(old_pdes[READ_END]);
 		}
-		ft_putendl(plist->arg[0]);
 		execve(plist->arg[0], plist->arg, g_env);
 		ft_putstr_fd("ft_sh1: exec format error: ", 2);
 		ft_putendl_fd(plist->arg[0], 2);
 		exit(EXIT_FAILURE);
 	}
-	if (father > 0)
-	{
-		if (plist->next != NULL)
-			exec_cmd(plist->next, new_pdes);
-		else
-			wait(NULL);
-	}
+	//close(new_pdes[WRITE_END]);
+	//if (plist->next)
+	//{
+	//	pid2 = fork();
+	//	if (pid2 > 0)
+	//		wait(NULL);
+	//	if (pid2 == 0)
+	//	{
+	//		close(new_pdes[WRITE_END]);
+	//		dup2(new_pdes[READ_END], STDIN_FILENO);
+	//		//close(new_pdes[WRITE_END]);
+	//		execve(plist->next->arg[0], plist->next->arg, g_env);
+	//		ft_putstr_fd("ft_sh1: exec format error: ", 2);
+	//		ft_putendl_fd(plist->arg[0], 2);
+	//		exit(EXIT_FAILURE);
+	//	}
+	//}
+	//close(new_pdes[READ_END]);
 	return (1);
 }
 
