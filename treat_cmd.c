@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/28 15:01:51 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/03 18:23:21 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/04 16:30:44 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,14 +62,12 @@ int		is_redir(char *s)
 {
 	if (ft_strnequ(s, "|", 1) == 1)
 		return (1);
+	if (ft_strnequ(s, ">>", 2) == 1)
+		return (2);
 	if (ft_strnequ(s, ">", 1) == 1)
 		return (1);
-	if (ft_strnequ(s, ">>", 2) == 1)
-		return (1);
 	if (ft_strnequ(s, "<", 1) == 1)
-		return (2);
-	if (ft_strnequ(s, "<<", 2) == 1)
-		return (2);
+		return (1);
 	return (0);
 }
 
@@ -80,22 +78,22 @@ int		get_node(char *cmd, int i, t_arg **plist)
 	char	**arg;
 	size_t	sz_arg;
 	int		j;
-	int		ret;
 
 	j = i;
 	redir = NULL;
-	if ((ret = is_redir(cmd + j)) != 0)
+	if ((j = is_redir(cmd + i)) != 0)
 	{
-		redir = ft_strsub(cmd, j, ret);
-		j += ret;
-		i += ret;
+		redir = ft_strsub(cmd, i, j);
+		j += i;
+		i = j;
 	}
-	while (cmd[j] && (ret = is_redir(cmd + j)) == 0)
+	while (cmd[j] && is_redir(cmd + j) == 0)
 		j++;
 	tmp = ft_strsub(cmd, i, j - i);
 	tmp = replace_tabs(tmp);
 	arg = ft_sizesplit(tmp, ' ', &sz_arg);
 	arg = tilde_and_dollar(arg, sz_arg);
+	free(tmp);
 	if (sz_arg == 0)
 		*plist = NULL;
 	else
@@ -127,20 +125,26 @@ t_arg	*cmd_to_list(char *cmd)
 	return (blist);
 }
 
-void	treat_cmd(char **arg, size_t sz_arg)
+void	do_commands(char **arg, size_t sz_arg)
 {
 	size_t	i;
-	t_arg	*blst;
+	t_arg	*blist;
+	char	**path;
+	size_t	nb_path;
 
 	i = 0;
 	while (i != sz_arg)
 	{
-		blst = cmd_to_list(arg[i]);
-		if (blst != NULL)
+		blist = cmd_to_list(arg[i]);
+		if (blist != NULL)
 		{
-			if (built_in(blst->arg, blst->sz_arg) == 0)
-				try_all_path(blst);
-			lstdel(&blst);
+			if (built_in(blist->arg, blist->sz_arg) == 0)
+			{
+				path = ft_sizesplit(find_env("PATH"), ':', &nb_path);
+				exec_cmd(blist, NULL, path, nb_path);
+				ft_freetab(path, nb_path);
+			}
+			lstdel(&blist);
 		}
 		i++;
 	}

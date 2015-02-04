@@ -6,14 +6,14 @@
 #    By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2014/12/14 11:02:20 by ncolliau          #+#    #+#              #
-#    Updated: 2015/01/28 15:02:12 by ncolliau         ###   ########.fr        #
+#    Updated: 2015/02/04 13:21:31 by ncolliau         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = ft_minishell2
 
 OBJ =	main.o env.o cd.o get_next_line.o env_tools.o exec.o treat_cmd.o \
-		arg_list.o
+		arg_list.o access.o
 
 PATH_INCLUDES = includes/
 

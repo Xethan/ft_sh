@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:55:27 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/03 18:00:56 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/04 13:21:05 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ int		main(int ac, char **av, char **env)
 		}
 		arg = ft_sizesplit(line, ';', &sz_arg);
 		free(line);
-		treat_cmd(arg, sz_arg);
+		do_commands(arg, sz_arg);
 		if (sz_arg != 0)
 			ft_freetab(arg, sz_arg);
 	}

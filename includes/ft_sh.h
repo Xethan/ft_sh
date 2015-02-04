@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:56:19 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/01 17:19:14 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/04 15:43:12 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,17 +44,21 @@ typedef struct		s_arg
 	char			**arg;
 	size_t			sz_arg;
 	char			*redir;
+	int				*fd_tab;
+	int				sz_fd_tab;
 	struct	s_arg	*next;
 }					t_arg;
 
 int					built_in(char **cmd, size_t sz_arg);
 
 t_arg				*cmd_to_list(char *cmd);
-void				treat_cmd(char **arg, size_t sz_arg);
+void				do_commands(char **arg, size_t sz_arg);
 
+int					exec_cmd(t_arg *plist, int old_pdes[2], char **path, size_t nb_path);
+
+void				access_error(int error, char *name);
 int					check_access(char *bin_path);
-//int					exec_cmd(t_arg *plist, int test);
-void				try_all_path(t_arg *blist);
+int					find_path(char **path, size_t nb_path, char **arg);
 
 t_arg				*lstnew(char **arg, size_t sz_arg, char *redir);
 void				lst_creat_after(t_arg *list, char **arg, size_t sz_arg, char *redir);
