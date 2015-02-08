@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/12 15:32:34 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/24 16:56:20 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/08 15:22:50 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,11 @@ void	ft_setenv(char *name, char *value)
 	int		i;
 	char	*tmp;
 
+	if (ft_strchr(value, '=') != NULL)
+	{
+		ft_putendl_fd("setenv: \"=\" is not allowed in env variables", 2);
+		return ;
+	}
 	if ((i = nb_env(name)) != -1)
 	{
 		tmp = g_env[i];

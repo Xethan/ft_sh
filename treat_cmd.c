@@ -6,87 +6,37 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/28 15:01:51 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/06 14:55:13 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/08 16:58:40 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_sh.h"
 
-char	*replace_tabs(char *line)
+int		get_redir_and_file(t_arg **pnode, char *cmd, int i, int sz)
 {
-	int		i;
+	int		j;
 
-	i = 0;
-	while (line[i])
-	{
-		if (ft_isspace(line[i]) == 1)
-			line[i] = ' ';
+	while (cmd[i] && (j = is_redir(cmd + i)) == 0)
 		i++;
-	}
-	return (line);
-}
-
-char	**tilde_and_dollar(char **cmd, size_t sz_cmd)
-{
-	size_t	i;
-	char	*tmp;
-	char	*var;
-
-	i = 0;
-	while (i != sz_cmd)
+	if (j != 0)
 	{
-		cmd[i] = replace_tabs(cmd[i]);
-		if (find_env("HOME") != NULL)
-			if (cmd[i][0] == '~' && (cmd[i][1] == '\0' || cmd[i][1] == '/'))
-			{
-				tmp = cmd[i];
-				cmd[i] = ft_strjoin(find_env("HOME"), cmd[i] + 1);
-				free(tmp);
-			}
-		if (cmd[i][0] == '$')
+		(*pnode)->redir = ft_restralloc((*pnode)->redir, sz, 1)
+		(*pnode)->redir[sz] = ft_strsub(cmd, i, j);
+		while (cmd[i + j] && ft_isspace(cmd[i + j]) == 1)
+			j++;
+		i += j;
+		j = 0;
+		while (cmd[i + j] && ft_isspace(cmd[i + j]) == 0)
+			j++;
+		if (j != 0)
 		{
-			var = ft_strcdup(cmd[i] + 1, '/');
-			if (find_env(var) != NULL)
-			{
-				tmp = cmd[i];
-				cmd[i] = ft_strjoin(find_env(var), cmd[i] + ft_strlen(var) + 1);
-				free(tmp);
-			}
-			free(var);
+			(*pnode)->file = ft_restralloc((*pnode)->file, sz, 1)
+			(*pnode)->file[sz] = ft_strsub(cmd, i, j);
+			file = ft_strsub(cmd, i, j);
 		}
-		i++;
+		i += j;
 	}
-	return (cmd);
-}
-int		is_redir(char *s)
-{
-	if (ft_strnequ(s, ">>", 2) == 1)
-		return (2);
-	if (ft_strnequ(s, ">", 1) == 1)
-		return (1);
-	if (ft_strnequ(s, "<<", 2) == 1)
-		return (2);
-	if (ft_strnequ(s, "<", 1) == 1)
-		return (1);
-	return (0);
-}
-
-int		*ft_realloc_int(int *tab, int length, size_t size)
-{
-	int		*tmp;
-	int		i;
-
-	i = -1;
-	if (length != 0)
-		tmp = tab;
-	tab = (int *)malloc((length + size) * sizeof(int));
-	if (tab == NULL)
-		return (NULL);
-	while (++i != length)
-		tab[i] = tmp[i];
-	if (length != 0)
-		free(tmp);
-	return (tab);
+	return (i);
 }
 
 char	*get_newline(t_arg **pnode, char *cmd)
@@ -129,6 +79,7 @@ char	*get_newline(t_arg **pnode, char *cmd)
 				fd = open(file, O_CREAT | O_RDWR | O_APPEND, 0664);
 			else if (ft_strequ(redir, "<") == 1)
 				fd = open(file, O_RDONLY) * -1;
+
 			if (fd == -1 || fd == 1)
 			{
 				ft_putstr_fd("Open failed : ", 2);
@@ -216,7 +167,7 @@ void	do_commands(char **arg, size_t sz_arg)
 				exec_cmd(blist, NULL, path, nb_path);
 				ft_freetab(path, nb_path);
 			}
-			//lstdel(&blist);
+			lstdel(&blist);
 		}
 		i++;
 	}

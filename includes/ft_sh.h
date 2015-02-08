@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:56:19 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/05 16:20:09 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/08 16:25:58 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,9 +43,10 @@ typedef struct		s_arg
 {
 	char			**arg;
 	size_t			sz_arg;
-	char			*redir;
 	int				*fd_tab;
 	size_t			sz;
+	char			**redir;
+	char			**file;
 	struct	s_arg	*next;
 }					t_arg;
 
@@ -54,14 +55,18 @@ int					built_in(char **cmd, size_t sz_arg);
 t_arg				*cmd_to_list(char *cmd);
 void				do_commands(char **arg, size_t sz_arg);
 
+int					is_redir(char *s);
+char				*replace_tabs(char *line);
+char				**tilde_and_dollar(char **cmd, size_t sz_cmd);
+int					*ft_realloc_int(int *tab, int length, size_t size);
+
 int					exec_cmd(t_arg *plist, int old_pdes[2], char **path, size_t nb_path);
 
 void				access_error(int error, char *name);
 int					check_access(char *bin_path);
 int					find_path(char **path, size_t nb_path, char **arg);
 
-t_arg				*lstnew(char **arg, size_t sz_arg, char *redir);
-void				lst_creat_after(t_arg *list, char **arg, size_t sz_arg, char *redir);
+t_arg				*lstnew(char **arg, size_t sz_arg, int *fd_tab, int sz);
 void				lstdel(t_arg **begin_list);
 
 void				up_shlvl(void);
