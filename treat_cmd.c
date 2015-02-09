@@ -6,45 +6,62 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/28 15:01:51 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/08 16:58:40 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/09 18:16:27 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_sh.h"
 
-int		get_redir_and_file(t_arg **pnode, char *cmd, int i, int sz)
+t_arg	*open_files(t_arg *pnode, char *redir, char *file)
 {
-	int		j;
+	int		fd;
 
-	while (cmd[i] && (j = is_redir(cmd + i)) == 0)
-		i++;
-	if (j != 0)
+	if (ft_strequ(redir, ">") == 1)
+		fd = open(file, O_CREAT | O_RDWR | O_TRUNC, 0664);
+	else if (ft_strequ(redir, ">>") == 1)
+		fd = open(file, O_CREAT | O_RDWR | O_APPEND, 0664);
+	else if (ft_strequ(redir, "<") == 1)
+		fd = open(file, O_RDONLY) * -1;
+	if (fd == -1 || fd == 1)
 	{
-		(*pnode)->redir = ft_restralloc((*pnode)->redir, sz, 1)
-		(*pnode)->redir[sz] = ft_strsub(cmd, i, j);
-		while (cmd[i + j] && ft_isspace(cmd[i + j]) == 1)
-			j++;
-		i += j;
-		j = 0;
-		while (cmd[i + j] && ft_isspace(cmd[i + j]) == 0)
-			j++;
-		if (j != 0)
-		{
-			(*pnode)->file = ft_restralloc((*pnode)->file, sz, 1)
-			(*pnode)->file[sz] = ft_strsub(cmd, i, j);
-			file = ft_strsub(cmd, i, j);
-		}
-		i += j;
+		ft_putstr_fd("Open failed : ", 2);
+		ft_putendl_fd(file, 2);
+		exit(EXIT_FAILURE);
 	}
+	else
+	{
+		pnode->fd_tab = ft_realloc_int(pnode->fd_tab, pnode->sz, 1);
+		pnode->fd_tab[pnode->sz] = fd;
+		pnode->sz++;
+	}
+	return (pnode);
+}
+
+int		get_redir_and_file(t_arg ***pnode, char *cmd, int i, int j)
+{
+	char	*redir;
+	char	*file;
+
+	redir = ft_strsub(cmd, i, j);
+	while (cmd[i + j] && ft_isspace(cmd[i + j]) == 1)
+		j++;
+	i += j;
+	j = 0;
+	while (cmd[i + j] && ft_isspace(cmd[i + j]) == 0)
+		j++;
+	if (j != 0)
+		file = ft_strsub(cmd, i, j);
+	i += j;
+	if (file && redir)
+		**pnode = open_files(**pnode, redir, file);
+	free(redir);
+	free(file);
 	return (i);
 }
 
 char	*get_newline(t_arg **pnode, char *cmd)
 {
 	char	*newline;
-	char	*redir;
-	char	*file;
-	int		fd;
 	int		i;
 	int		j;
 
@@ -52,48 +69,13 @@ char	*get_newline(t_arg **pnode, char *cmd)
 	newline = ft_strdup(cmd);
 	while (cmd[i])
 	{
-		file = NULL;
-		redir = NULL;
 		while (cmd[i] && (j = is_redir(cmd + i)) == 0)
 			i++;
 		if (j != 0)
 		{
-			redir = ft_strsub(cmd, i, j);
-			while (cmd[i + j] && ft_isspace(cmd[i + j]) == 1)
-				j++;
-			ft_memset(newline + i, ' ', j);
-			i += j;
-			j = 0;
-			while (cmd[i + j] && ft_isspace(cmd[i + j]) == 0)
-				j++;
-			if (j != 0)
-				file = ft_strsub(cmd, i, j);
-			ft_memset(newline + i, ' ', j);
-			i += j;
-		}
-		if (file != NULL && redir != NULL)
-		{
-			if (ft_strequ(redir, ">") == 1)
-				fd = open(file, O_CREAT | O_RDWR | O_TRUNC, 0664);
-			else if (ft_strequ(redir, ">>") == 1)
-				fd = open(file, O_CREAT | O_RDWR | O_APPEND, 0664);
-			else if (ft_strequ(redir, "<") == 1)
-				fd = open(file, O_RDONLY) * -1;
-
-			if (fd == -1 || fd == 1)
-			{
-				ft_putstr_fd("Open failed : ", 2);
-				ft_putendl_fd(file, 2);
-				exit(EXIT_FAILURE);
-			}
-			else
-			{
-				(*pnode)->fd_tab = ft_realloc_int((*pnode)->fd_tab, (*pnode)->sz, 1);
-				(*pnode)->fd_tab[(*pnode)->sz] = fd;
-				(*pnode)->sz++;
-			}
-			free(redir);
-			free(file);
+			j = get_redir_and_file(&pnode, cmd, i, j);
+			ft_memset(newline + i, ' ', j - i);
+			i = j;
 		}
 	}
 	return (newline);
@@ -145,7 +127,7 @@ t_arg	*cmd_to_list(char *arg)
 		i++;
 	}
 	free(cmd);
-	return	(blist);
+	return (blist);
 }
 
 void	do_commands(char **arg, size_t sz_arg)

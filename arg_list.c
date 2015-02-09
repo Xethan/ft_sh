@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/23 11:09:53 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/08 14:48:56 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/09 16:35:07 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,4 +42,3 @@ void	lstdel(t_arg **begin_list)
 		free(cpy);
 	}
 }
-

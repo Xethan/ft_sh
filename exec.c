@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/21 11:17:16 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/08 16:04:08 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/09 17:53:06 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,13 +55,13 @@ void	child(t_arg *plist, int new_pdes[2], int old_pdes[2])
 	size_t	i;
 
 	i = -1;
-	while (++i != plist->sz)
-		exec_redir(plist, plist->fd_tab[i]);
 	if (old_pdes != NULL)
 	{
 		close(old_pdes[WRITE_END]);
 		dup2(old_pdes[READ_END], STDIN_FILENO);
 	}
+	while (++i != plist->sz)
+		exec_redir(plist, plist->fd_tab[i]);
 	if (plist->next)
 	{
 		close(new_pdes[READ_END]);
