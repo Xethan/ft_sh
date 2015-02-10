@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:56:19 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/09 18:06:25 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/10 17:02:05 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ int					exec_cmd(t_arg *plist, int old_pdes[2], char **path, size_t nb_path);
 void				access_error(int error, char *name);
 int					check_access(char *bin_path);
 int					find_path(char **path, size_t nb_path, char **arg);
+char				*ft_strtrijoin(char *s1, char *s2, char *s3);
 
 t_arg				*lstnew(char **arg, size_t sz_arg, int *fd_tab, int sz);
 void				lstdel(t_arg **begin_list);

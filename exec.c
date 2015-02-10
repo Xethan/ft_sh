@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/21 11:17:16 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/09 17:53:06 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/10 17:17:53 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,22 +27,6 @@ void	exec_redir(t_arg *plist, int fd)
 			dup2(fd, STDOUT_FILENO);
 		if (fd < 0)
 			dup2(fd * -1, STDIN_FILENO);
-		/*
-		if (ft_strequ(redir, "<<") == 1)
-		{
-			ret = 1;
-			while ((ret = get_next_line(0, &stdin) == 1 && ft_strequ(stdin, end_read)) == 0)
-			{
-				if (ret == -1)
-				{
-					bla bla
-				}
-				tmp = line;
-				line = ft_strjoin(line, stdin);
-				free(tmp);
-			}
-		}
-		*/
 		execve(plist->arg[0], plist->arg, g_env);
 		ft_putstr_fd("ft_sh1: exec format error: ", 2);
 		ft_putendl_fd(plist->arg[0], 2);
