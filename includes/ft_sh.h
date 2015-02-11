@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:56:19 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/10 17:02:05 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/11 12:13:58 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,9 @@ typedef struct		s_arg
 	char			**arg;
 	size_t			sz_arg;
 	int				*fd_tab;
-	size_t			sz;
+	size_t			nb_fd;
+	char			**stop;
+	int				nb_stop;
 	struct	s_arg	*next;
 }					t_arg;
 

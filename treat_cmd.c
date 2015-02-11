@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/28 15:01:51 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/09 18:16:27 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/11 12:23:51 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,23 +16,33 @@ t_arg	*open_files(t_arg *pnode, char *redir, char *file)
 {
 	int		fd;
 
-	if (ft_strequ(redir, ">") == 1)
-		fd = open(file, O_CREAT | O_RDWR | O_TRUNC, 0664);
-	else if (ft_strequ(redir, ">>") == 1)
-		fd = open(file, O_CREAT | O_RDWR | O_APPEND, 0664);
-	else if (ft_strequ(redir, "<") == 1)
-		fd = open(file, O_RDONLY) * -1;
-	if (fd == -1 || fd == 1)
+	if (ft_strequ(redir, "<<") == 1)
 	{
-		ft_putstr_fd("Open failed : ", 2);
-		ft_putendl_fd(file, 2);
-		exit(EXIT_FAILURE);
+		pnode->stop = ft_restralloc(pnode->stop, pnode->nb_stop, 1);
+		pnode->stop[pnode->nb_stop] = ft_strdup(file);
+		pnode->nb_stop++;
 	}
 	else
 	{
-		pnode->fd_tab = ft_realloc_int(pnode->fd_tab, pnode->sz, 1);
-		pnode->fd_tab[pnode->sz] = fd;
-		pnode->sz++;
+		fd = -1;
+		if (ft_strequ(redir, ">") == 1)
+			fd = open(file, O_CREAT | O_RDWR | O_TRUNC, 0664);
+		else if (ft_strequ(redir, ">>") == 1)
+			fd = open(file, O_CREAT | O_RDWR | O_APPEND, 0664);
+		else if (ft_strequ(redir, "<") == 1)
+			fd = open(file, O_RDONLY) * -1;
+		if (fd == -1 || fd == 1)
+		{
+			ft_putstr_fd("Open failed : ", 2);
+			ft_putendl_fd(file, 2);
+			exit(EXIT_FAILURE);
+		}
+		else
+		{
+			pnode->fd_tab = ft_realloc_int(pnode->fd_tab, pnode->nb_fd, 1);
+			pnode->fd_tab[pnode->nb_fd] = fd;
+			pnode->nb_fd++;
+		}
 	}
 	return (pnode);
 }
@@ -90,7 +100,9 @@ t_arg	*cmd_to_node(char *cmd)
 
 	node = (t_arg *)malloc(sizeof(t_arg));
 	node->fd_tab = NULL;
-	node->sz = 0;
+	node->nb_fd = 0;
+	node->stop = NULL;
+	node->nb_stop = 0;
 	newline = get_newline(&node, cmd);
 	arg = ft_sizesplit(newline, ' ', &sz_arg);
 	arg = tilde_and_dollar(arg, sz_arg);
