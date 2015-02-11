@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/21 11:17:16 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/11 12:47:50 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/11 17:17:25 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,16 +20,16 @@ char	*get_stdin(char **stop, size_t nb_stop)
 	char	*line;
 	char	*stdin;
 	char	*tmp;
-	int		i;
+	size_t	i;
 
 	i = 0;
 	line = NULL;
 	ret = 1;
-	while (i != plist->nb_stop)
+	while (i != nb_stop)
 	{
 		stdin = NULL;
 		ft_putstr("> ");
-		while ((ret = get_next_line(0, &stdin)) == 1 && ft_strequ(stdin, plist->stop[i]) == 0)
+		while ((ret = get_next_line(0, &stdin)) == 1 && ft_strequ(stdin, stop[i]) == 0)
 		{
 			if (ret == -1)
 			{
@@ -68,6 +68,7 @@ void	exec_read_stdin_redir(t_arg *plist)
 		close(pdes[READ_END]);
 		dup2(pdes[WRITE_END], STDOUT_FILENO);
 		ft_putstr(line);
+		free(line);
 		close(pdes[WRITE_END]);
 		exit(EXIT_SUCCESS);
 	}

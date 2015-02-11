@@ -6,7 +6,7 @@
 #    By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2014/12/14 11:02:20 by ncolliau          #+#    #+#              #
-#    Updated: 2015/02/08 16:27:19 by ncolliau         ###   ########.fr        #
+#    Updated: 2015/02/11 16:33:20 by ncolliau         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -46,6 +46,3 @@ fclean : clean
 
 re : fclean all
 
-norme :
-			norminette $(OBJ:.o=.c) $(INCLUDES)
-			make -C libft/ norme
