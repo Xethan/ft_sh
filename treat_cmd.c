@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/28 15:01:51 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/11 12:23:51 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/13 16:44:18 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,24 +24,30 @@ t_arg	*open_files(t_arg *pnode, char *redir, char *file)
 	}
 	else
 	{
-		fd = -1;
-		if (ft_strequ(redir, ">") == 1)
-			fd = open(file, O_CREAT | O_RDWR | O_TRUNC, 0664);
-		else if (ft_strequ(redir, ">>") == 1)
-			fd = open(file, O_CREAT | O_RDWR | O_APPEND, 0664);
-		else if (ft_strequ(redir, "<") == 1)
-			fd = open(file, O_RDONLY) * -1;
-		if (fd == -1 || fd == 1)
+		if (ft_strequ(redir, "<") == 1)
 		{
-			ft_putstr_fd("Open failed : ", 2);
-			ft_putendl_fd(file, 2);
-			exit(EXIT_FAILURE);
+			fd = open(file, O_RDONLY);
+			if (fd == -1)
+			{
+				ft_putstr_fd("Open failed : ", 2);
+				ft_putendl_fd(file, 2);
+				exit(EXIT_FAILURE);
+			}
+			pnode->left_fd = ft_realloc_int(pnode->left_fd, fd);
 		}
 		else
 		{
-			pnode->fd_tab = ft_realloc_int(pnode->fd_tab, pnode->nb_fd, 1);
-			pnode->fd_tab[pnode->nb_fd] = fd;
-			pnode->nb_fd++;
+			if (ft_strequ(redir, ">") == 1)
+				fd = open(file, O_CREAT | O_RDWR | O_TRUNC, 0664);
+			else if (ft_strequ(redir, ">>") == 1)
+				fd = open(file, O_CREAT | O_RDWR | O_APPEND, 0664);
+			if (fd == -1)
+			{
+				ft_putstr_fd("Open failed : ", 2);
+				ft_putendl_fd(file, 2);
+				exit(EXIT_FAILURE);
+			}
+			pnode->right_fd = ft_realloc_int(pnode->right_fd, fd);
 		}
 	}
 	return (pnode);
@@ -95,19 +101,18 @@ t_arg	*cmd_to_node(char *cmd)
 {
 	t_arg	*node;
 	char	**arg;
-	size_t	sz_arg;
 	char	*newline;
 
 	node = (t_arg *)malloc(sizeof(t_arg));
-	node->fd_tab = NULL;
-	node->nb_fd = 0;
+	node->left_fd = (int *)malloc(1 * sizeof(int));
+	node->left_fd[0] = -1;
+	node->right_fd = (int *)malloc(1 * sizeof(int));
+	node->right_fd[0] = -1;
 	node->stop = NULL;
 	node->nb_stop = 0;
 	newline = get_newline(&node, cmd);
-	arg = ft_sizesplit(newline, ' ', &sz_arg);
-	arg = tilde_and_dollar(arg, sz_arg);
-	node->arg = arg;
-	node->sz_arg = sz_arg;
+	arg = ft_sizesplit(newline, ' ', &node->sz_arg);
+	node->arg = tilde_and_dollar(arg, node->sz_arg);
 	node->next = NULL;
 	free(newline);
 	free(cmd);
@@ -158,7 +163,8 @@ void	do_commands(char **arg, size_t sz_arg)
 			if (built_in(blist->arg, blist->sz_arg) == 0)
 			{
 				path = ft_sizesplit(find_env("PATH"), ':', &nb_path);
-				exec_cmd(blist, NULL, path, nb_path);
+				//exec_cmd(blist, NULL, path, nb_path);
+				try_again(blist, NULL, path, nb_path);
 				ft_freetab(path, nb_path);
 			}
 			lstdel(&blist);

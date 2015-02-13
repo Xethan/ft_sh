@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   tools_cmd.c                                        :+:      :+:    :+:   */
+/*   cmd_tools.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/08 16:16:26 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/08 16:20:00 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/13 17:17:47 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,20 +72,24 @@ char	**tilde_and_dollar(char **cmd, size_t sz_cmd)
 	return (cmd);
 }
 
-int		*ft_realloc_int(int *tab, int length, size_t size)
+int		*ft_realloc_int(int *tab, int nb)
 {
 	int		*tmp;
 	int		i;
+	int		length;
 
 	i = -1;
-	if (length != 0)
-		tmp = tab;
-	tab = (int *)malloc((length + size) * sizeof(int));
+	length = 0;
+	while (tab[length] != -1)
+		length++;
+	tmp = tab;
+	tab = (int *)malloc((length + 2) * sizeof(int));
 	if (tab == NULL)
 		return (NULL);
 	while (++i != length)
 		tab[i] = tmp[i];
-	if (length != 0)
-		free(tmp);
+	tab[length] = nb;
+	tab[length + 1] = -1;
+	free(tmp);
 	return (tab);
 }
