@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/28 15:01:51 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/13 16:44:18 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/15 17:53:06 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,11 +59,11 @@ int		get_redir_and_file(t_arg ***pnode, char *cmd, int i, int j)
 	char	*file;
 
 	redir = ft_strsub(cmd, i, j);
-	while (cmd[i + j] && ft_isspace(cmd[i + j]) == 1)
+	while (cmd[i + j] && cmd[i + j] == ' ')
 		j++;
 	i += j;
 	j = 0;
-	while (cmd[i + j] && ft_isspace(cmd[i + j]) == 0)
+	while (cmd[i + j] && cmd[i + j] != ' ')
 		j++;
 	if (j != 0)
 		file = ft_strsub(cmd, i, j);
@@ -112,6 +112,8 @@ t_arg	*cmd_to_node(char *cmd)
 	node->nb_stop = 0;
 	newline = get_newline(&node, cmd);
 	arg = ft_sizesplit(newline, ' ', &node->sz_arg);
+	if (node->sz_arg == 0)
+		return (NULL);
 	node->arg = tilde_and_dollar(arg, node->sz_arg);
 	node->next = NULL;
 	free(newline);
@@ -157,13 +159,13 @@ void	do_commands(char **arg, size_t sz_arg)
 	i = 0;
 	while (i != sz_arg)
 	{
+		arg[i] = replace_tabs(arg[i]);
 		blist = cmd_to_list(arg[i]);
 		if (blist != NULL)
 		{
-			if (built_in(blist->arg, blist->sz_arg) == 0)
+			if (built_in(blist) == 0)
 			{
 				path = ft_sizesplit(find_env("PATH"), ':', &nb_path);
-				//exec_cmd(blist, NULL, path, nb_path);
 				try_again(blist, NULL, path, nb_path);
 				ft_freetab(path, nb_path);
 			}

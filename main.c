@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:55:27 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/11 16:59:26 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/15 18:24:58 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 char	**g_env;
 
-void	disp_cmd_line(void)
+void	disp_prompt(void)
 {
 	char	*dir;
 
@@ -37,30 +37,50 @@ void	disp_cmd_line(void)
 	free(dir);
 }
 
-int		built_in(char **cmd, size_t sz_arg)
+int		built_in(t_arg *plist)
 {
-	if (ft_strequ(cmd[0], "exit"))
+	int		exit_value;
+
+	if (ft_strequ(plist->arg[0], "exit"))
 	{
 		free_env();
-		ft_freetab(cmd, sz_arg);
-		exit(EXIT_SUCCESS);
+		if (plist->sz_arg > 1)
+			exit_value = ft_atoi(plist->arg[1]);
+		else
+			exit_value = 0;
+		lstdel(&plist);
+		exit(exit_value);
 	}
-	if (ft_strequ(cmd[0], "cd"))
-		change_dir(cmd, sz_arg);
-	else if (ft_strequ(cmd[0], "env"))
+	if (ft_strequ(plist->arg[0], "cd"))
+		change_dir(plist->arg, plist->sz_arg);
+	else if (ft_strequ(plist->arg[0], "env"))
 		ft_env();
-	else if (ft_strequ(cmd[0], "setenv"))
+	else if (ft_strequ(plist->arg[0], "setenv"))
 	{
-		if (sz_arg == 3)
-			ft_setenv(cmd[1], cmd[2]);
+		if (plist->sz_arg == 3)
+			ft_setenv(plist->arg[1], plist->arg[2]);
 		else
 			ft_putendl_fd("setenv: Not the right numbers of arguments", 2);
 	}
-	else if (ft_strequ(cmd[0], "unsetenv"))
-		ft_unsetenv(cmd, sz_arg);
+	else if (ft_strequ(plist->arg[0], "unsetenv"))
+		ft_unsetenv(plist->arg, plist->sz_arg);
 	else
 		return (0);
 	return (1);
+}
+
+int		check_error(char *line)
+{
+	if (ft_strstr(line, ">>>") != NULL)
+		ft_putendl_fd("ft_sh: \">>>\" is not allowed", 2);
+	else if (ft_strstr(line, "<<<") != NULL)
+		ft_putendl_fd("ft_sh: \"<<<\" is not allowed", 2);
+	else if (ft_strstr(line, "||") != NULL)
+		ft_putendl_fd("ft_sh: \"||\" is not allowed", 2);
+	else
+		return (1);
+	free(line);
+	return (0);
 }
 
 void	quit(int signal)
@@ -78,18 +98,20 @@ void	shell(void)
 	signal(SIGINT, quit);
 	while (1)
 	{
-		disp_cmd_line();
+		disp_prompt();
 		if (get_next_line(0, &line) == -1)
 		{
 			ft_putendl_fd("Error get_next_line", 2);
 			exit(EXIT_FAILURE);
 		}
-		// gestion d'erreur <<< >>> + ?
-		arg = ft_sizesplit(line, ';', &sz_arg);
-		free(line);
-		do_commands(arg, sz_arg);
-		if (sz_arg != 0)
-			ft_freetab(arg, sz_arg);
+		if (check_error(line) == 1)
+		{
+			arg = ft_sizesplit(line, ';', &sz_arg);
+			free(line);
+			do_commands(arg, sz_arg);
+			if (sz_arg != 0)
+				ft_freetab(arg, sz_arg);
+		}
 	}
 }
 

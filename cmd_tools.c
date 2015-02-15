@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/08 16:16:26 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/13 17:17:47 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/15 17:50:43 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,6 @@ char	**tilde_and_dollar(char **cmd, size_t sz_cmd)
 	i = 0;
 	while (i != sz_cmd)
 	{
-		cmd[i] = replace_tabs(cmd[i]);
 		if (find_env("HOME") != NULL)
 			if (cmd[i][0] == '~' && (cmd[i][1] == '\0' || cmd[i][1] == '/'))
 			{

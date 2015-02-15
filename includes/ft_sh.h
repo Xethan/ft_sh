@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:56:19 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/13 16:53:11 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/15 17:53:50 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ typedef struct		s_arg
 
 int					try_again(t_arg *plist, int old_pdes[2], char **path, size_t nb_path);
 
-int					built_in(char **cmd, size_t sz_arg);
+int					built_in(t_arg *plist);
 
 t_arg				*cmd_to_list(char *cmd);
 void				do_commands(char **arg, size_t sz_arg);
@@ -63,8 +63,7 @@ char				**tilde_and_dollar(char **cmd, size_t sz_cmd);
 int					*ft_realloc_int(int *tab, int nb);
 
 char				*get_stdin(char **stop, size_t nb_stop);
-void				read_stdin(t_arg *plist);
-int					exec_cmd(t_arg *plist, int old_pdes[2], char **path, size_t nb_path);
+void				read_stdin(char *line);
 
 void				access_error(int error, char *name);
 int					check_access(char *bin_path);
