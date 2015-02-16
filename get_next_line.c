@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/10 14:37:40 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/16 13:02:59 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/16 16:11:12 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,14 +27,14 @@ int		read_line(char **buf, int fd)
 		tmp = *buf;
 		*buf = ft_strjoin(*buf, buffer);
 		free(tmp);
-		ft_memset(buffer, 0, read_bytes);
+		ft_memset(buffer, 0, BUFF_SIZE + 1);
 	}
 	return (read_bytes);
 }
 
 int		get_next_line(int const fd, char **line)
 {
-	static char	*buf;
+	static char	*buf = NULL;
 	char		*tmp;
 	int			read_bytes;
 

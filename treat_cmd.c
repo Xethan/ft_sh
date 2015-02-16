@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/28 15:01:51 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/15 17:53:06 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/16 11:59:42 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,7 +149,7 @@ t_arg	*cmd_to_list(char *arg)
 	return (blist);
 }
 
-void	do_commands(char **arg, size_t sz_arg)
+void	cmd_to_list_and_exec(char **arg, size_t sz_arg)
 {
 	size_t	i;
 	t_arg	*blist;
@@ -166,7 +166,7 @@ void	do_commands(char **arg, size_t sz_arg)
 			if (built_in(blist) == 0)
 			{
 				path = ft_sizesplit(find_env("PATH"), ':', &nb_path);
-				try_again(blist, NULL, path, nb_path);
+				launch_cmds(blist, NULL, path, nb_path);
 				ft_freetab(path, nb_path);
 			}
 			lstdel(&blist);

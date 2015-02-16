@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/12 15:37:27 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/27 12:23:04 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/16 17:45:54 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,8 @@ void	chdir_me(char *target)
 	{
 		target = NULL;
 		target = getcwd(target, 0);
-		ft_setenv("OLDPWD", find_env("PWD"));
+		if (find_env("PWD") != NULL)
+			ft_setenv("OLDPWD", find_env("PWD"));
 		ft_setenv("PWD", target);
 		free(target);
 		return ;
@@ -70,7 +71,8 @@ void	change_dir(char **arg, size_t sz_arg)
 		chdir_me(find_env("HOME"));
 	else if (ft_strequ(arg[1], "-"))
 	{
-		ft_putendl(find_env("OLDPWD"));
+		if (find_env("OLDPWD") != NULL)
+			ft_putendl(find_env("OLDPWD"));
 		chdir_me(find_env("OLDPWD"));
 	}
 	else if (sz_arg == 3)

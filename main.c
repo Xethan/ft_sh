@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:55:27 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/15 18:24:58 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/16 17:42:37 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ int		built_in(t_arg *plist)
 		if (plist->sz_arg == 3)
 			ft_setenv(plist->arg[1], plist->arg[2]);
 		else
-			ft_putendl_fd("setenv: Not the right numbers of arguments", 2);
+			ft_putendl_fd("ft_sh: usage: setenv [name] [value]", 2);
 	}
 	else if (ft_strequ(plist->arg[0], "unsetenv"))
 		ft_unsetenv(plist->arg, plist->sz_arg);
@@ -108,7 +108,7 @@ void	shell(void)
 		{
 			arg = ft_sizesplit(line, ';', &sz_arg);
 			free(line);
-			do_commands(arg, sz_arg);
+			cmd_to_list_and_exec(arg, sz_arg);
 			if (sz_arg != 0)
 				ft_freetab(arg, sz_arg);
 		}

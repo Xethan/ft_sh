@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/12 15:32:34 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/08 15:22:50 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/16 17:41:49 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ void	ft_setenv(char *name, char *value)
 	int		i;
 	char	*tmp;
 
-	if (ft_strchr(value, '=') != NULL)
+	if (ft_strchr(value, '=') != NULL || ft_strchr(name, '=') != NULL)
 	{
 		ft_putendl_fd("setenv: \"=\" is not allowed in env variables", 2);
 		return ;
@@ -102,7 +102,7 @@ void	ft_unsetenv(char **to_del, size_t sz_arg)
 	i = 0;
 	if (sz_arg <= 1)
 	{
-		ft_putendl_fd("unsetenv: Not enough arguments", 2);
+		ft_putendl_fd("ft_sh: usage: unsetenv [name] [name] ... [name]", 2);
 		return ;
 	}
 	while (i != sz_arg)
