@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/28 15:01:51 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/16 11:59:42 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/17 17:40:31 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,7 +132,7 @@ t_arg	*cmd_to_list(char *arg)
 	cmd = ft_strsplit(arg, '|');
 	blist = NULL;
 	i = 0;
-	while (cmd[i] != NULL)
+	while (cmd && cmd[i])
 	{
 		new_node = cmd_to_node(cmd[i]);
 		if (new_node != NULL)
@@ -159,7 +159,6 @@ void	cmd_to_list_and_exec(char **arg, size_t sz_arg)
 	i = 0;
 	while (i != sz_arg)
 	{
-		arg[i] = replace_tabs(arg[i]);
 		blist = cmd_to_list(arg[i]);
 		if (blist != NULL)
 		{
@@ -167,7 +166,7 @@ void	cmd_to_list_and_exec(char **arg, size_t sz_arg)
 			{
 				path = ft_sizesplit(find_env("PATH"), ':', &nb_path);
 				launch_cmds(blist, NULL, path, nb_path);
-				ft_freetab(path, nb_path);
+				ft_freetab(path);
 			}
 			lstdel(&blist);
 		}
