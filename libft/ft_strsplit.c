@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/07 10:08:37 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/17 17:30:16 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/18 13:04:39 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ char	**ft_strsplit(char const *s, char c)
 		i++;
 	while (s[i])
 	{
-		if ((map = ft_restralloc(map, nb_words, 1)) == NULL)
+		if ((map = ft_realloc_str_tab(map, NULL)) == NULL)
 			return (NULL);
 		map[nb_words] = ft_strcdup(s + i, c);
 		i += ft_strclen(s + i, c);

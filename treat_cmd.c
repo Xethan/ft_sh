@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/28 15:01:51 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/17 17:40:31 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/18 15:44:33 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,40 +14,24 @@
 
 t_arg	*open_files(t_arg *pnode, char *redir, char *file)
 {
-	int		fd;
+	char	*tmp;
 
 	if (ft_strequ(redir, "<<") == 1)
-	{
-		pnode->stop = ft_restralloc(pnode->stop, pnode->nb_stop, 1);
-		pnode->stop[pnode->nb_stop] = ft_strdup(file);
-		pnode->nb_stop++;
-	}
+		pnode->stop = ft_realloc_str_tab(pnode->stop, file);
 	else
 	{
 		if (ft_strequ(redir, "<") == 1)
-		{
-			fd = open(file, O_RDONLY);
-			if (fd == -1)
-			{
-				ft_putstr_fd("Open failed : ", 2);
-				ft_putendl_fd(file, 2);
-				exit(EXIT_FAILURE);
-			}
-			pnode->left_fd = ft_realloc_int(pnode->left_fd, fd);
-		}
+			pnode->left_fd = ft_realloc_str_tab(pnode->left_fd, file);
 		else
 		{
 			if (ft_strequ(redir, ">") == 1)
-				fd = open(file, O_CREAT | O_RDWR | O_TRUNC, 0664);
+				pnode->right_fd = ft_realloc_str_tab(pnode->right_fd, file);
 			else if (ft_strequ(redir, ">>") == 1)
-				fd = open(file, O_CREAT | O_RDWR | O_APPEND, 0664);
-			if (fd == -1)
 			{
-				ft_putstr_fd("Open failed : ", 2);
-				ft_putendl_fd(file, 2);
-				exit(EXIT_FAILURE);
+				tmp = ft_strjoin(">", file);
+				pnode->right_fd = ft_realloc_str_tab(pnode->right_fd, tmp);
+				free(tmp);
 			}
-			pnode->right_fd = ft_realloc_int(pnode->right_fd, fd);
 		}
 	}
 	return (pnode);
@@ -104,12 +88,9 @@ t_arg	*cmd_to_node(char *cmd)
 	char	*newline;
 
 	node = (t_arg *)malloc(sizeof(t_arg));
-	node->left_fd = (int *)malloc(1 * sizeof(int));
-	node->left_fd[0] = -1;
-	node->right_fd = (int *)malloc(1 * sizeof(int));
-	node->right_fd[0] = -1;
+	node->left_fd = NULL;
+	node->right_fd = NULL;
 	node->stop = NULL;
-	node->nb_stop = 0;
 	newline = get_newline(&node, cmd);
 	arg = ft_sizesplit(newline, ' ', &node->sz_arg);
 	if (node->sz_arg == 0)
@@ -162,12 +143,9 @@ void	cmd_to_list_and_exec(char **arg, size_t sz_arg)
 		blist = cmd_to_list(arg[i]);
 		if (blist != NULL)
 		{
-			if (built_in(blist) == 0)
-			{
-				path = ft_sizesplit(find_env("PATH"), ':', &nb_path);
-				launch_cmds(blist, NULL, path, nb_path);
-				ft_freetab(path);
-			}
+			path = ft_sizesplit(find_env("PATH"), ':', &nb_path);
+			launch_cmds(blist, NULL, path, nb_path);
+			ft_freetab(path);
 			lstdel(&blist);
 		}
 		i++;

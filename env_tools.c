@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/15 16:54:52 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/01/26 15:18:06 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/18 18:02:28 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,20 +14,19 @@
 
 extern char	**g_env;
 
-void	dup_env(char **env, int ac, char **av)
+char	**dup_env(char **env)
 {
 	int		i;
+	char	**env_cpy;;
 
-	(void)ac;
-	(void)av;
 	i = 0;
-	while (env[i] != NULL)
+	while (env && env[i] != NULL)
 		i++;
-	g_env = (char **)malloc((i + 1) * sizeof(char *));
-	g_env[i] = NULL;
+	env_cpy = (char **)malloc((i + 1) * sizeof(char *));
+	env_cpy[i] = NULL;
 	while (i-- != 0)
-		g_env[i] = ft_strdup(env[i]);
-	up_shlvl();
+		env_cpy[i] = ft_strdup(env[i]);
+	return (env_cpy);
 }
 
 void	free_env(void)
@@ -35,12 +34,13 @@ void	free_env(void)
 	int		i;
 
 	i = 0;
-	while (g_env[i] != NULL)
+	while (g_env && g_env[i] != NULL)
 	{
 		free(g_env[i]);
 		i++;
 	}
 	free(g_env);
+	g_env = NULL;
 }
 
 size_t	len_env(void)
@@ -48,7 +48,7 @@ size_t	len_env(void)
 	size_t	i;
 
 	i = 0;
-	while (g_env[i] != NULL)
+	while (g_env && g_env[i] != NULL)
 		i++;
 	return (i);
 }
@@ -59,7 +59,7 @@ char	*find_env(char *str)
 	char	*cmp;
 
 	i = 0;
-	while (g_env[i] != NULL)
+	while (g_env && g_env[i] != NULL)
 	{
 		cmp = ft_strcdup(g_env[i], '=');
 		if (ft_strequ(str, cmp))
@@ -79,7 +79,7 @@ int		nb_env(char *to_find)
 	char	*tmp;
 
 	i = 0;
-	while (g_env[i] != NULL)
+	while (g_env && g_env[i] != NULL)
 	{
 		tmp = ft_strcdup(g_env[i], '=');
 		if (ft_strequ(to_find, tmp))

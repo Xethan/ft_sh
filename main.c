@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:55:27 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/17 18:01:52 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/18 18:30:16 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,10 @@ int		disp_prompt(void)
 	dir = NULL;
 	dir = getcwd(dir, 0);
 	ft_putstr(C_MAGENTA);
-	ft_putstr(find_env("USER"));
+	if (find_env("USER"))
+		ft_putstr(find_env("USER"));
+	else
+		ft_putstr("?");
 	ft_putstr(C_NONE);
 	ft_putstr(" in ");
 	ft_putstr(C_CYAN);
@@ -38,7 +41,7 @@ int		disp_prompt(void)
 	return (1);
 }
 
-int		built_in(t_arg *plist)
+int		built_in(t_arg *plist, char **path, size_t nb_path)
 {
 	int		exit_value;
 
@@ -55,13 +58,13 @@ int		built_in(t_arg *plist)
 	if (ft_strequ(plist->arg[0], "cd"))
 		change_dir(plist->arg, plist->sz_arg);
 	else if (ft_strequ(plist->arg[0], "env"))
-		ft_env();
+		return (ft_env(plist, path, nb_path));
 	else if (ft_strequ(plist->arg[0], "setenv"))
 	{
-		if (plist->sz_arg == 3)
-			ft_setenv(plist->arg[1], plist->arg[2]);
+		if (plist->sz_arg != 1)
+			ft_setenv(plist->arg + 1);
 		else
-			ft_putendl_fd("ft_sh: usage: setenv [name] [value]", 2);
+			ft_putendl_fd("ft_sh: usage: setenv [name=value ...]", 2);
 	}
 	else if (ft_strequ(plist->arg[0], "unsetenv"))
 		ft_unsetenv(plist->arg, plist->sz_arg);
@@ -142,6 +145,7 @@ void	shell(void)
 	signal(SIGSEGV, quit);
 	signal(SIGBUS, quit);
 	signal(SIGFPE, quit);
+	// abort ?
 	ret = -1;
 	while (disp_prompt() && (ret = get_next_line(0, &line)) == 1)
 	{
@@ -160,7 +164,10 @@ void	shell(void)
 
 int		main(int ac, char **av, char **env)
 {
-	dup_env(env, ac, av);
+	(void)ac;
+	(void)av;
+	g_env = dup_env(env);
+	up_shlvl();
 	shell();
 	free_env();
 	return (0);

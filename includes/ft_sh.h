@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:56:19 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/16 12:13:18 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/18 18:05:26 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,25 +43,24 @@ typedef struct		s_arg
 {
 	char			**arg;
 	size_t			sz_arg;
-	int				*left_fd;
-	int				*right_fd;
+	char			**left_fd;
+	char			**right_fd;
 	char			**stop;
-	int				nb_stop;
-	struct	s_arg	*next;
+	struct s_arg	*next;
 }					t_arg;
 
-int					built_in(t_arg *plist);
+int					built_in(t_arg *plist, char **path, size_t nb_path);
 
 int					launch_cmds(t_arg *plist, int old_pdes[2], char **path, size_t nb_path);
-char				*get_stdin(char **stop, size_t nb_stop);
+char				*get_stdin(char **stop);
 void				put_in_stdin(char *line);
 
 void				fd_to_fd(t_arg *plist);
-void				fd_to_pipe(t_arg *plist, int new_pdes[2]);
+void				fd_to_output(t_arg *plist, int new_pdes[2]);
 void				stdin_to_fd(t_arg *plist, char *line);
-void				stdin_to_pipe(t_arg *plist, char *line, int new_pdes[2]);
-void				left_pipe_to_fd(t_arg *plist, char *pipe);
-void				left_pipe_to_pipe(t_arg *plist, int new_pdes[2], char *pipe);
+void				stdin_to_output(t_arg *plist, char *line, int new_pdes[2]);
+void				input_to_fd(t_arg *plist, char *pipe);
+void				input_to_output(t_arg *plist, int new_pdes[2], char *pipe);
 
 t_arg				*cmd_to_list(char *cmd);
 void				cmd_to_list_and_exec(char **arg, size_t sz_arg);
@@ -80,11 +79,12 @@ void				chdir_me(char *target);
 void				change_dir(char **arg, size_t sz_arg);
 
 void				up_shlvl(void);
-void				ft_env(void);
-void				ft_setenv(char *name, char *value);
+int					ft_env(t_arg *plist, char **path, size_t nb_path);
+void				ft_setenv(char **arg);
+void				ft_setenv_name_value(char *name, char *value);
 void				ft_unsetenv(char **to_del, size_t sz_arg);
 
-void				dup_env(char **env, int ac, char **av);
+char				**dup_env(char **env);
 void				free_env(void);
 size_t				len_env(void);
 char				*find_env(char *str);
