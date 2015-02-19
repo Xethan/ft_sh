@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:56:19 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/18 18:05:26 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/19 16:54:27 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,12 +49,13 @@ typedef struct		s_arg
 	struct s_arg	*next;
 }					t_arg;
 
-int					built_in(t_arg *plist, char **path, size_t nb_path);
+int					built_in(t_arg *plist, int new_pdes[2], char **path, size_t nb_path);
 
 int					launch_cmds(t_arg *plist, int old_pdes[2], char **path, size_t nb_path);
 char				*get_stdin(char **stop);
 void				put_in_stdin(char *line);
 
+int					open_it(char *file, int redir);
 void				fd_to_fd(t_arg *plist);
 void				fd_to_output(t_arg *plist, int new_pdes[2]);
 void				stdin_to_fd(t_arg *plist, char *line);
@@ -79,8 +80,8 @@ void				chdir_me(char *target);
 void				change_dir(char **arg, size_t sz_arg);
 
 void				up_shlvl(void);
-int					ft_env(t_arg *plist, char **path, size_t nb_path);
-void				ft_setenv(char **arg);
+int					ft_env(t_arg *plist, int new_pdes[2], char **path, size_t nb_path);
+int					ft_setenv(char **arg);
 void				ft_setenv_name_value(char *name, char *value);
 void				ft_unsetenv(char **to_del, size_t sz_arg);
 

@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/15 16:54:52 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/18 18:02:28 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/18 18:38:43 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ extern char	**g_env;
 char	**dup_env(char **env)
 {
 	int		i;
-	char	**env_cpy;;
+	char	**env_cpy;
 
 	i = 0;
 	while (env && env[i] != NULL)

@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/12 15:32:34 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/18 17:17:53 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/19 13:47:05 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,22 @@ void	up_shlvl(void)
 	free(lvl);
 }
 
-void	ft_setenv(char **arg)
+int		verif_new_var(char *str)
+{
+	if (ft_strchr(str, '=') == NULL)
+		ft_putendl_fd("usage: setenv [name=value ...]", 2);
+	else if (ft_strchr(str, '=') != ft_strrchr(str, '='))
+		ft_putendl_fd("setenv: only one \'=\' allowed in [name=value]", 2);
+	else if (ft_strclen(str, '=') == 0)
+		ft_putendl_fd("setenv: missing either name or value", 2);
+	else if (ft_strlen(ft_strchr(str, '=')) == 1)
+		ft_putendl_fd("setenv: missing either name or value", 2);
+	else
+		return (1);
+	return (0);
+}
+
+int		ft_setenv(char **arg)
 {
 	int		i;
 	int		pos;
@@ -38,16 +53,8 @@ void	ft_setenv(char **arg)
 	i = 0;
 	while (arg && arg[i])
 	{
-		if (ft_strchr(arg[i], '=') == NULL)
-		{
-			ft_putendl_fd("ft_sh: usage: setenv [name=value ...]", 2);
-			return ;
-		}
-		if (ft_strchr(arg[i], '=') != ft_strrchr(arg[i], '='))
-		{
-			ft_putendl_fd("setenv: only one \'=\' allowed in [name=value]", 2);
-			return ;
-		}
+		if (verif_new_var(arg[i]) == 0)
+			return (0);
 		name = ft_strcdup(arg[i], '=');
 		if ((pos = nb_env(name)) != -1)
 		{
@@ -59,6 +66,7 @@ void	ft_setenv(char **arg)
 		free(name);
 		i++;
 	}
+	return (1);
 }
 
 void	ft_setenv_name_value(char *name, char *value)
@@ -117,7 +125,7 @@ void	ft_unsetenv(char **to_del, size_t sz_arg)
 	i = 0;
 	if (sz_arg <= 1)
 	{
-		ft_putendl_fd("ft_sh: usage: unsetenv [name ...]", 2);
+		ft_putendl_fd("usage: unsetenv [name ...]", 2);
 		return ;
 	}
 	while (i != sz_arg)

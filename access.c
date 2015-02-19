@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/04 13:15:47 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/04 13:17:18 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/19 17:30:49 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,11 @@
 void	access_error(int error, char *name)
 {
 	if (error == -2)
-		ft_putstr_fd("ft_sh1: permission denied: ", 2);
+		ft_putstr_fd("ft_sh: permission denied: ", 2);
 	if (error == 0)
-		ft_putstr_fd("ft_sh1: command not found: ", 2);
+		ft_putstr_fd("ft_sh: command not found: ", 2);
 	if (error == -1)
-		ft_putstr_fd("ft_sh1: no such file or directory: ", 2);
+		ft_putstr_fd("ft_sh: no such file or directory: ", 2);
 	if (error != 1)
 		ft_putendl_fd(name, 2);
 }

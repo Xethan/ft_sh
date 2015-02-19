@@ -6,23 +6,32 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/13 13:22:55 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/18 15:44:32 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/19 16:53:48 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 #include "ft_sh.h"
 
 extern char	**g_env;
 
-int		open_it(char *file)
+int		open_it(char *file, int redir)
 {
 	int		fd;
 
-	if (file[0] == '>')
-		fd = open(file + 1, O_CREAT | O_RDWR | O_APPEND, 0664);
+	if (redir == WRITE_END)
+	{
+		if (file[0] == '>')
+			fd = open(file + 1, O_CREAT | O_RDWR | O_APPEND, 0664);
+		else
+			fd = open(file, O_CREAT | O_RDWR | O_TRUNC, 0664);
+	}
 	else
-		fd = open(file, O_CREAT | O_RDWR | O_TRUNC, 0664);
+		fd = open(file, O_RDONLY);
+	if (fd == -1)
+	{
+		ft_putstr_fd("ft_sh: open failed: ", 2);
+		ft_putendl_fd(file, 2);
+	}
 	return (fd);
 }
 
@@ -40,9 +49,9 @@ void	fd_to_fd(t_arg *plist)
 		j = 0;
 		while (plist->right_fd && plist->right_fd[j])
 		{
-			if ((rfd = open_it(plist->right_fd[j])) == -1)
+			if ((rfd = open_it(plist->right_fd[j], WRITE_END)) == -1)
 				return ;
-			if ((lfd = open(plist->left_fd[i], O_RDONLY)) == -1)
+			if ((lfd = open_it(plist->left_fd[i], READ_END)) == -1)
 				return ;
 			pid = fork();
 			if (pid > 0)
@@ -70,7 +79,7 @@ void	fd_to_output(t_arg *plist, int new_pdes[2])
 	i = 0;
 	while (plist->left_fd && plist->left_fd[i])
 	{
-		if ((fd = open(plist->left_fd[i], O_RDONLY)) == -1)
+		if ((fd = open_it(plist->left_fd[i], READ_END)) == -1)
 			return ;
 		pid = fork();
 		if (pid > 0)
@@ -103,7 +112,7 @@ void	stdin_to_fd(t_arg *plist, char *line)
 	i = 0;
 	while (plist->right_fd && plist->right_fd[i])
 	{
-		if ((fd = open_it(plist->right_fd[i])) == -1)
+		if ((fd = open_it(plist->right_fd[i], WRITE_END)) == -1)
 			return ;
 		pid = fork();
 		if (pid > 0)
@@ -151,7 +160,7 @@ void	input_to_fd(t_arg *plist, char *pipe)
 	i = 0;
 	while (plist->right_fd && plist->right_fd[i])
 	{
-		if ((fd = open_it(plist->right_fd[i])) == -1)
+		if ((fd = open_it(plist->right_fd[i], WRITE_END)) == -1)
 			return ;
 		pid = fork();
 		if (pid > 0)

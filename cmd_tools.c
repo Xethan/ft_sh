@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/08 16:16:26 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/18 12:20:30 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/18 18:38:17 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,25 +70,3 @@ char	**tilde_and_dollar(char **cmd, size_t sz_cmd)
 	}
 	return (cmd);
 }
-
-// int		*ft_realloc_int(int *tab, int nb)
-// {
-// 	int		*tmp;
-// 	int		i;
-// 	int		length;
-
-// 	i = -1;
-// 	length = 0;
-// 	while (tab[length] != -1)
-// 		length++;
-// 	tmp = tab;
-// 	tab = (int *)malloc((length + 2) * sizeof(int));
-// 	if (tab == NULL)
-// 		return (NULL);
-// 	while (++i != length)
-// 		tab[i] = tmp[i];
-// 	tab[length] = nb;
-// 	tab[length + 1] = -1;
-// 	free(tmp);
-// 	return (tab);
-// }

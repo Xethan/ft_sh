@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:55:27 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/18 18:30:16 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/19 16:31:12 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ int		disp_prompt(void)
 	return (1);
 }
 
-int		built_in(t_arg *plist, char **path, size_t nb_path)
+int		built_in(t_arg *plist, int new_pdes[2], char **path, size_t nb_path)
 {
 	int		exit_value;
 
@@ -58,7 +58,7 @@ int		built_in(t_arg *plist, char **path, size_t nb_path)
 	if (ft_strequ(plist->arg[0], "cd"))
 		change_dir(plist->arg, plist->sz_arg);
 	else if (ft_strequ(plist->arg[0], "env"))
-		return (ft_env(plist, path, nb_path));
+		return (ft_env(plist, new_pdes, path, nb_path));
 	else if (ft_strequ(plist->arg[0], "setenv"))
 	{
 		if (plist->sz_arg != 1)
@@ -123,7 +123,7 @@ int		check_error(char *line)
 	return (0);
 }
 
-void	quit(int signal)
+void	sighandler(int signal)
 {
 	if (signal == SIGBUS)
 		ft_putendl_fd("ft_sh: bus error", 2);
@@ -140,12 +140,12 @@ void	shell(void)
 	char	**arg;
 	size_t	sz_arg;
 
-	signal(SIGINT, quit);
-	signal(SIGQUIT, quit);
-	signal(SIGSEGV, quit);
-	signal(SIGBUS, quit);
-	signal(SIGFPE, quit);
-	// abort ?
+	signal(SIGINT, sighandler);
+	signal(SIGQUIT, sighandler);
+	signal(SIGSEGV, sighandler);
+	signal(SIGBUS, sighandler);
+	signal(SIGFPE, sighandler);
+	signal(SIGTSTP, sighandler);
 	ret = -1;
 	while (disp_prompt() && (ret = get_next_line(0, &line)) == 1)
 	{
