@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:56:19 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/19 16:54:27 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/20 16:59:50 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ void				input_to_fd(t_arg *plist, char *pipe);
 void				input_to_output(t_arg *plist, int new_pdes[2], char *pipe);
 
 t_arg				*cmd_to_list(char *cmd);
-void				cmd_to_list_and_exec(char **arg, size_t sz_arg);
+void				cmd_to_list_and_exec(char **arg);
 
 int					is_redir(char *s);
 char				*replace_tabs(char *line);

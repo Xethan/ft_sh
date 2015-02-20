@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/21 11:17:16 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/19 16:27:01 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/20 17:16:42 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,6 +105,12 @@ int		cmds_to_output(t_arg *plist, int new_pdes[2], char *line, char *pipe_out)
 	fd_to_fd(plist);
 	if (plist->stop != NULL)
 		stdin_to_fd(plist, line);
+	if (plist->next)
+		if (pipe(new_pdes) == -1)
+		{
+			ft_putendl_fd("Pipe failed", 2);
+			return (-1);
+		}
 	if (plist->next || plist->right_fd == NULL)
 	{
 		if (pipe_out != NULL || (plist->left_fd == NULL && plist->stop == NULL))
@@ -123,12 +129,6 @@ int		launch_cmds(t_arg *plist, int old_pdes[2], char **path, size_t nb_path)
 	char	*line;
 	char	*pipe_out;
 
-	if (plist->next)
-		if (pipe(new_pdes) == -1)
-		{
-			ft_putendl_fd("Pipe failed", 2);
-			return (-1);
-		}
 	if ((ret = built_in(plist, new_pdes, path, nb_path)) != 0)
 	{
 		if (plist->next && ret == 1)

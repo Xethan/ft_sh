@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/18 16:12:29 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/19 17:03:09 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/20 17:46:49 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,12 @@ void	disp_env(t_arg *plist, int new_pdes[2])
 		close(fd);
 		j++;
 	}
+	if (plist->next)
+		if (pipe(new_pdes) == -1)
+		{
+			ft_putendl_fd("Pipe failed", 2);
+			return ;
+		}
 	i = 0;
 	while (g_env && g_env[i] != NULL)
 	{

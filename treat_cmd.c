@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/28 15:01:51 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/18 15:44:33 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/20 17:16:35 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ int		get_redir_and_file(t_arg ***pnode, char *cmd, int i, int j)
 	char	*redir;
 	char	*file;
 
+	file = NULL;
 	redir = ft_strsub(cmd, i, j);
 	while (cmd[i + j] && cmd[i + j] == ' ')
 		j++;
@@ -130,7 +131,7 @@ t_arg	*cmd_to_list(char *arg)
 	return (blist);
 }
 
-void	cmd_to_list_and_exec(char **arg, size_t sz_arg)
+void	cmd_to_list_and_exec(char **arg)
 {
 	size_t	i;
 	t_arg	*blist;
@@ -138,7 +139,7 @@ void	cmd_to_list_and_exec(char **arg, size_t sz_arg)
 	size_t	nb_path;
 
 	i = 0;
-	while (i != sz_arg)
+	while (arg && arg[i])
 	{
 		blist = cmd_to_list(arg[i]);
 		if (blist != NULL)

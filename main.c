@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:55:27 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/19 16:31:12 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/20 17:16:33 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,7 +138,6 @@ void	shell(void)
 	int		ret;
 	char	*line;
 	char	**arg;
-	size_t	sz_arg;
 
 	signal(SIGINT, sighandler);
 	signal(SIGQUIT, sighandler);
@@ -152,11 +151,10 @@ void	shell(void)
 		line = replace_tabs(line);
 		if (check_error(line) == 1)
 		{
-			arg = ft_sizesplit(line, ';', &sz_arg);
+			arg = ft_strsplit(line, ';');
 			free(line);
-			cmd_to_list_and_exec(arg, sz_arg);
-			if (sz_arg != 0)
-				ft_freetab(arg);
+			cmd_to_list_and_exec(arg);
+			ft_freetab(arg);
 		}
 	}
 	(ret == -1) ? ft_putendl_fd("Error get_next_line", 2) : ft_putchar('\n');
