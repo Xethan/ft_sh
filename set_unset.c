@@ -1,33 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   set_unset_env.c                                    :+:      :+:    :+:   */
+/*   set_unset.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/12 15:32:34 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/20 17:46:58 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/22 16:41:38 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_sh.h"
 
 extern char	**g_env;
-
-void	up_shlvl(void)
-{
-	int		i;
-	int		nbr;
-	char	*lvl;
-
-	if ((i = nb_env("SHLVL")) == -1)
-		nbr = 1;
-	else
-		nbr = ft_atoi(g_env[i] + ft_strclen(g_env[i], '=') + 1) + 1;
-	lvl = ft_itoa(nbr);
-	ft_setenv_name_value("SHLVL", lvl);
-	free(lvl);
-}
 
 int		verif_new_var(char *str)
 {

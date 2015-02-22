@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/21 11:17:16 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/20 17:16:42 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/22 17:16:54 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,38 +14,59 @@
 
 extern char	**g_env;
 
-char	*get_stdin(char **stop)
+int		open_it(char *file, int redir)
+{
+	int		fd;
+
+	if (redir == WRITE_END)
+	{
+		if (file[0] == '>')
+			fd = open(file + 1, O_CREAT | O_RDWR | O_APPEND, 0664);
+		else
+			fd = open(file, O_CREAT | O_RDWR | O_TRUNC, 0664);
+	}
+	else
+		fd = open(file, O_RDONLY);
+	if (fd == -1)
+	{
+		ft_putstr_fd("ft_sh: open failed: ", 2);
+		ft_putendl_fd(file, 2);
+	}
+	return (fd);
+}
+
+char	*get_input(char **stop)
 {
 	int		ret;
+	char	*input;
 	char	*line;
-	char	*stdin;
 	char	*tmp;
 	size_t	i;
 
 	i = 0;
-	line = NULL;
+	input = NULL;
 	ret = 1;
 	while (stop && stop[i])
 	{
-		stdin = NULL;
+		input = NULL;
 		ft_putstr("> ");
-		while ((ret = get_next_line(0, &stdin)) == 1 && ft_strequ(stdin, stop[i]) == 0)
+		while ((ret = get_next_line(0, &line)) == 1 && ft_strequ(line, stop[i]) == 0)
 		{
 			if (ret == -1)
 			{
 				ft_putendl_fd("Error GNL", 2);
 				exit(EXIT_FAILURE);
 			}
-			tmp = line;
-			line = ft_strtrijoin(line, stdin, "\n");
+			tmp = input;
+			input = ft_strtrijoin(input, line, "\n");
 			free(tmp);
-			free(stdin);
+			free(line);
 			ft_putstr("> ");
 		}
-		free(stdin);
+		free(line);
 		i++;
 	}
-	return (line);
+	return (input);
 }
 
 char	*get_pipe(int old_pdes[2])
@@ -74,7 +95,7 @@ char	*get_pipe(int old_pdes[2])
 	return (pipe);
 }
 
-void	put_in_stdin(char *line)
+void	put_in_stdin(char *input)
 {
 	pid_t	pid;
 	int		pdes[2];
@@ -91,20 +112,20 @@ void	put_in_stdin(char *line)
 	{
 		close(pdes[READ_END]);
 		dup2(pdes[WRITE_END], STDOUT_FILENO);
-		ft_putstr(line);
+		ft_putstr(input);
 		close(pdes[WRITE_END]);
 		exit(EXIT_SUCCESS);
 	}
 	close(pdes[READ_END]);
 }
 
-int		cmds_to_output(t_arg *plist, int new_pdes[2], char *line, char *pipe_out)
+int		cmds_to_output(t_arg *plist, int new_pdes[2], char *input, char *pipe_out)
 {
 	if (pipe_out != NULL || (plist->left_fd == NULL && plist->stop == NULL))
-		input_to_fd(plist, pipe_out);
+		stdin_to_fd(plist, pipe_out);
 	fd_to_fd(plist);
 	if (plist->stop != NULL)
-		stdin_to_fd(plist, line);
+		input_to_fd(plist, input);
 	if (plist->next)
 		if (pipe(new_pdes) == -1)
 		{
@@ -114,46 +135,10 @@ int		cmds_to_output(t_arg *plist, int new_pdes[2], char *line, char *pipe_out)
 	if (plist->next || plist->right_fd == NULL)
 	{
 		if (pipe_out != NULL || (plist->left_fd == NULL && plist->stop == NULL))
-			input_to_output(plist, new_pdes, pipe_out);
+			stdin_to_output(plist, new_pdes, pipe_out);
 		fd_to_output(plist, new_pdes);
 		if (plist->stop != NULL)
-			stdin_to_output(plist, line, new_pdes);
+			input_to_output(plist, input, new_pdes);
 	}
-	return (1);
-}
-
-int		launch_cmds(t_arg *plist, int old_pdes[2], char **path, size_t nb_path)
-{
-	int		ret;
-	int		new_pdes[2];
-	char	*line;
-	char	*pipe_out;
-
-	if ((ret = built_in(plist, new_pdes, path, nb_path)) != 0)
-	{
-		if (plist->next && ret == 1)
-			launch_cmds(plist->next, new_pdes, path, nb_path);
-		return (1);
-	}
-	line = NULL;
-	pipe_out = NULL;
-	ret = find_path(path, nb_path, plist->arg);
-	access_error(ret, plist->arg[0]);
-	if (ret != 1)
-		return (-1);
-	if (plist->stop != NULL)
-		line = get_stdin(plist->stop);
-	if (old_pdes != NULL)
-	{
-		pipe_out = get_pipe(old_pdes);
-		close(old_pdes[READ_END]);
-		close(old_pdes[WRITE_END]);
-	}
-	if (cmds_to_output(plist, new_pdes, line, pipe_out) == -1)
-		return (-1);
-	free(line);
-	free(pipe_out);
-	if (plist->next)
-		launch_cmds(plist->next, new_pdes, path, nb_path);
 	return (1);
 }

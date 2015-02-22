@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:56:19 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/20 16:59:50 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/22 18:54:09 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,41 +49,33 @@ typedef struct		s_arg
 	struct s_arg	*next;
 }					t_arg;
 
-int					built_in(t_arg *plist, int new_pdes[2], char **path, size_t nb_path);
+int					launch_cmds(t_arg *plist, int old_pdes[2], char **path);
 
-int					launch_cmds(t_arg *plist, int old_pdes[2], char **path, size_t nb_path);
-char				*get_stdin(char **stop);
-void				put_in_stdin(char *line);
-
-int					open_it(char *file, int redir);
-void				fd_to_fd(t_arg *plist);
-void				fd_to_output(t_arg *plist, int new_pdes[2]);
-void				stdin_to_fd(t_arg *plist, char *line);
-void				stdin_to_output(t_arg *plist, char *line, int new_pdes[2]);
-void				input_to_fd(t_arg *plist, char *pipe);
-void				input_to_output(t_arg *plist, int new_pdes[2], char *pipe);
-
-t_arg				*cmd_to_list(char *cmd);
-void				cmd_to_list_and_exec(char **arg);
-
-int					is_redir(char *s);
-char				*replace_tabs(char *line);
-char				**tilde_and_dollar(char **cmd, size_t sz_cmd);
-int					*ft_realloc_int(int *tab, int nb);
-
-void				access_error(int error, char *name);
-int					check_access(char *bin_path);
-int					find_path(char **path, size_t nb_path, char **arg);
-char				*ft_strtrijoin(char *s1, char *s2, char *s3);
-
-void				chdir_me(char *target);
-void				change_dir(char **arg, size_t sz_arg);
-
-void				up_shlvl(void);
-int					ft_env(t_arg *plist, int new_pdes[2], char **path, size_t nb_path);
+int					ft_env(t_arg *plist, int new_pdes[2], char **path);
 int					ft_setenv(char **arg);
 void				ft_setenv_name_value(char *name, char *value);
 void				ft_unsetenv(char **to_del, size_t sz_arg);
+
+int					open_it(char *file, int redir);
+char				*get_input(char **stop);
+char				*get_pipe(int old_pdes[2]);
+void				put_in_stdin(char *input);
+int					cmds_to_output(t_arg *plist, int new_pdes[2], char *input, char *pipe_out);
+
+void				fd_to_fd(t_arg *plist);
+void				fd_to_output(t_arg *plist, int new_pdes[2]);
+void				input_to_fd(t_arg *plist, char *line);
+void				input_to_output(t_arg *plist, char *line, int new_pdes[2]);
+void				stdin_to_fd(t_arg *plist, char *pipe);
+void				stdin_to_output(t_arg *plist, int new_pdes[2], char *pipe);
+
+t_arg				*cmd_to_list(char *cmd);
+int					is_redir(char *s);
+char				*replace_tabs(char *line);
+char				**tilde_and_dollar(char **cmd, size_t sz_cmd);
+
+void				chdir_me(char *target);
+void				change_dir(char **arg, size_t sz_arg);
 
 char				**dup_env(char **env);
 void				free_env(void);
@@ -91,6 +83,16 @@ size_t				len_env(void);
 char				*find_env(char *str);
 int					nb_env(char *to_find);
 
+int					check_error_pipe(char *line);
+int					check_error(char *line);
+void				access_error(int error, char *name);
+int					check_access(char *bin_path);
+int					find_path(char **path, char **arg);
+
+int					disp_prompt(void);
+int					get_exit_status(int status, char *prog);
+void				sighandler(int signal);
+void				up_shlvl(void);
 void				lstdel(t_arg **begin_list);
 
 #endif

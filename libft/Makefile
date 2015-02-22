@@ -6,7 +6,7 @@
 #    By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2014/11/07 15:24:29 by ncolliau          #+#    #+#              #
-#    Updated: 2015/02/18 12:51:57 by ncolliau         ###   ########.fr        #
+#    Updated: 2015/02/22 16:34:54 by ncolliau         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,7 +26,7 @@ OBJ =	ft_atoi.o ft_bzero.o ft_isalnum.o ft_isalpha.o ft_isascii.o \
 		ft_toupper.o ft_putlonglong.o ft_longlen.o ft_lstdelone.o ft_lstdel.o \
 		ft_lstiter.o ft_lstmap.o ft_nbrlen.o ft_lstlen.o ft_strndup.o \
 		ft_strcdup.o ft_strclen.o ft_putnbr_nl.o ft_putnbr_nl_fd.o \
-		ft_realloc_str_tab.o ft_sizesplit.o ft_freetab.o
+		ft_realloc_str_tab.o ft_sizesplit.o ft_freetab.o ft_strtrijoin.o
 
 FLAGS = -Wall -Wextra -Werror
 

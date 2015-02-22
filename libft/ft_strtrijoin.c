@@ -1,31 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   arg_list.c                                         :+:      :+:    :+:   */
+/*   ft_strtrijoin.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/11/23 11:09:53 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/18 12:54:38 by ncolliau         ###   ########.fr       */
+/*   Created: 2015/02/22 16:28:56 by ncolliau          #+#    #+#             */
+/*   Updated: 2015/02/22 16:29:09 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_sh.h"
+#include "libft.h"
 
-void	lstdel(t_arg **begin_list)
+char	*ft_strtrijoin(char *s1, char *s2, char *s3)
 {
-	t_arg		*p_list;
-	t_arg		*cpy;
+	char	*tmp;
 
-	p_list = *begin_list;
-	while (p_list)
-	{
-		ft_freetab(p_list->arg);
-		ft_freetab(p_list->stop);
-		ft_freetab(p_list->left_fd);
-		ft_freetab(p_list->right_fd);
-		cpy = p_list;
-		p_list = p_list->next;
-		free(cpy);
-	}
+	tmp = ft_strjoin(s2, s3);
+	s1 = ft_strjoin(s1, tmp);
+	free(tmp);
+	return (s1);
 }

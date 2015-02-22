@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/18 16:12:29 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/20 17:46:49 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/22 17:37:38 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ int		check_options(char **arg)
 	return (i);
 }
 
-void	disp_env(t_arg *plist, int new_pdes[2])
+void	put_env_in_fd(t_arg *plist)
 {
 	int		i;
 	int		j;
@@ -62,6 +62,13 @@ void	disp_env(t_arg *plist, int new_pdes[2])
 		close(fd);
 		j++;
 	}
+}
+
+void	disp_env(t_arg *plist, int new_pdes[2])
+{
+	int		i;
+
+	put_env_in_fd(plist);
 	if (plist->next)
 		if (pipe(new_pdes) == -1)
 		{
@@ -73,28 +80,20 @@ void	disp_env(t_arg *plist, int new_pdes[2])
 	{
 		if (plist->next)
 			ft_putendl_fd(g_env[i], new_pdes[WRITE_END]);
-		else if (j == 0)
+		else if (plist->right_fd == NULL)
 			ft_putendl(g_env[i]);
 		i++;
 	}
 }
 
-int		ft_env(t_arg *plist, int new_pdes[2], char **path, size_t nb_path)
+int		treat_options(t_arg *plist)
 {
-	int		i;
-	char	**tmp_env;
 	char	**add_to_env;
+	int		i;
 
 	add_to_env = NULL;
-	tmp_env = dup_env(g_env);
-	i = 1;
-	if (plist->sz_arg != 1)
+	if ((i = check_options(plist->arg)) != -1)
 	{
-		if ((i = check_options(plist->arg)) == -1)
-		{
-			g_env = tmp_env;
-			return (1);
-		}
 		while (plist->arg[i] && ft_strchr(plist->arg[i], '=') != NULL)
 		{
 			add_to_env = ft_realloc_str_tab(add_to_env, plist->arg[i]);
@@ -103,20 +102,29 @@ int		ft_env(t_arg *plist, int new_pdes[2], char **path, size_t nb_path)
 		if (ft_setenv(add_to_env) == 0)
 		{
 			ft_freetab(add_to_env);
-			return (1);
+			return (-1);
 		}
 		ft_freetab(add_to_env);
 	}
+	return (i);
+}
+
+int		ft_env(t_arg *plist, int new_pdes[2], char **path)
+{
+	int		i;
+	char	**tmp_env;
+
+	tmp_env = dup_env(g_env);
+	i = treat_options(plist);
 	if (plist->arg[i])
 	{
 		plist->arg += i;
-		launch_cmds(plist, NULL, path, nb_path);
-		plist->arg -= i;
+		launch_cmds(plist, NULL, path);
 		free_env();
 		g_env = tmp_env;
 		return (2);
 	}
-	else
+	else if (i != -1)
 		disp_env(plist, new_pdes);
 	free_env();
 	g_env = tmp_env;

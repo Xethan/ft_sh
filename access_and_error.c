@@ -1,16 +1,66 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   access.c                                           :+:      :+:    :+:   */
+/*   access_and_error.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/04 13:15:47 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/19 17:30:49 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/22 17:19:31 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_sh.h"
+
+int		check_error_pipe(char *line)
+{
+	char	**arg;
+	int		i;
+	int		j;
+	int		verif;
+
+	i = 0;
+	if (line[0] == '|' || ft_strlen(ft_strrchr(line, '|')) == 1)
+		return (0);
+	arg = ft_strsplit(line, '|');
+	if (arg == NULL && ft_strchr(line, '|') != NULL)
+		return (0);
+	while (arg && arg[i])
+	{
+		j = 0;
+		verif = 0;
+		while (arg[i][j] && arg[i][j] != ';')
+		{
+			if (arg[i][j] != ' ')
+				verif = 1;
+			j++;
+		}
+		if (verif == 0)
+		{
+			ft_freetab(arg);
+			return (0);
+		}
+		i++;
+	}
+	ft_freetab(arg);
+	return (1);
+}
+
+int		check_error(char *line)
+{
+	if (ft_strstr(line, ">>>") != NULL)
+		ft_putendl_fd("ft_sh: \">>>\" is not allowed", 2);
+	else if (ft_strstr(line, "<<<") != NULL)
+		ft_putendl_fd("ft_sh: \"<<<\" is not allowed", 2);
+	else if (ft_strstr(line, "||") != NULL)
+		ft_putendl_fd("ft_sh: \"||\" is not allowed", 2);
+	else if (ft_strchr(line, '|') != NULL && check_error_pipe(line) == 0)
+		ft_putendl_fd("ft_sh: pipe without command", 2);
+	else
+		return (1);
+	free(line);
+	return (0);
+}
 
 void	access_error(int error, char *name)
 {
@@ -51,17 +101,7 @@ int		check_access(char *full_path)
 	return (ret);
 }
 
-char	*ft_strtrijoin(char *s1, char *s2, char *s3)
-{
-	char	*tmp;
-
-	tmp = ft_strjoin(s2, s3);
-	s1 = ft_strjoin(s1, tmp);
-	free(tmp);
-	return (s1);
-}
-
-int		find_path(char **path, size_t nb_path, char **arg)
+int		find_path(char **path, char **arg)
 {
 	size_t	i;
 	char	*cmd;
@@ -70,7 +110,7 @@ int		find_path(char **path, size_t nb_path, char **arg)
 	if (arg[0][0] != '.' && arg[0][0] != '/')
 	{
 		i = 0;
-		while (i != nb_path)
+		while (path && path[i])
 		{
 			cmd = ft_strtrijoin(path[i], "/", arg[0]);
 			if ((ret = check_access(cmd)) == 1)

@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:55:27 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/20 17:16:33 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/22 17:55:48 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,34 +14,7 @@
 
 char	**g_env;
 
-int		disp_prompt(void)
-{
-	char	*dir;
-
-	dir = NULL;
-	dir = getcwd(dir, 0);
-	ft_putstr(C_MAGENTA);
-	if (find_env("USER"))
-		ft_putstr(find_env("USER"));
-	else
-		ft_putstr("?");
-	ft_putstr(C_NONE);
-	ft_putstr(" in ");
-	ft_putstr(C_CYAN);
-	if (ft_strstr(dir, find_env("HOME")))
-	{
-		ft_putstr("~");
-		ft_putstr(ft_strstr(dir, find_env("HOME")) + ft_strlen(find_env("HOME")));
-	}
-	else
-		ft_putstr(dir);
-	ft_putstr(C_NONE);
-	ft_putstr(" > ");
-	free(dir);
-	return (1);
-}
-
-int		built_in(t_arg *plist, int new_pdes[2], char **path, size_t nb_path)
+int		built_in(t_arg *plist, int new_pdes[2], char **path)
 {
 	int		exit_value;
 
@@ -58,7 +31,7 @@ int		built_in(t_arg *plist, int new_pdes[2], char **path, size_t nb_path)
 	if (ft_strequ(plist->arg[0], "cd"))
 		change_dir(plist->arg, plist->sz_arg);
 	else if (ft_strequ(plist->arg[0], "env"))
-		return (ft_env(plist, new_pdes, path, nb_path));
+		return (ft_env(plist, new_pdes, path));
 	else if (ft_strequ(plist->arg[0], "setenv"))
 	{
 		if (plist->sz_arg != 1)
@@ -73,64 +46,61 @@ int		built_in(t_arg *plist, int new_pdes[2], char **path, size_t nb_path)
 	return (1);
 }
 
-int		check_error_pipe(char *line)
+int		launch_cmds(t_arg *plist, int old_pdes[2], char **path)
 {
-	char	**arg;
-	int		i;
-	int		j;
-	int		verif;
+	int		ret;
+	int		new_pdes[2];
+	char	*input;
+	char	*pipe_out;
 
-	i = 0;
-	if (line[0] == '|' || ft_strlen(ft_strrchr(line, '|')) == 1)
-		return (0);
-	arg = ft_strsplit(line, '|');
-	if (arg == NULL && ft_strchr(line, '|') != NULL)
-		return (0);
-	while (arg && arg[i])
+	if ((ret = built_in(plist, new_pdes, path)) != 0)
 	{
-		j = 0;
-		verif = 0;
-		while (arg[i][j] && arg[i][j] != ';')
-		{
-			if (arg[i][j] != ' ')
-				verif = 1;
-			j++;
-		}
-		if (verif == 0)
-		{
-			ft_freetab(arg);
-			return (0);
-		}
-		i++;
+		if (plist->next && ret == 1)
+			launch_cmds(plist->next, new_pdes, path);
+		return (1);
 	}
-	ft_freetab(arg);
+	input = NULL;
+	pipe_out = NULL;
+	ret = find_path(path, plist->arg);
+	access_error(ret, plist->arg[0]);
+	if (ret != 1)
+		return (-1);
+	if (plist->stop != NULL)
+		input = get_input(plist->stop);
+	if (old_pdes != NULL)
+	{
+		pipe_out = get_pipe(old_pdes);
+		close(old_pdes[READ_END]);
+		close(old_pdes[WRITE_END]);
+	}
+	if (cmds_to_output(plist, new_pdes, input, pipe_out) == -1)
+		return (-1);
+	free(input);
+	free(pipe_out);
+	if (plist->next)
+		launch_cmds(plist->next, new_pdes, path);
 	return (1);
 }
 
-int		check_error(char *line)
+void	cmd_to_list_and_exec(char **arg)
 {
-	if (ft_strstr(line, ">>>") != NULL)
-		ft_putendl_fd("ft_sh: \">>>\" is not allowed", 2);
-	else if (ft_strstr(line, "<<<") != NULL)
-		ft_putendl_fd("ft_sh: \"<<<\" is not allowed", 2);
-	else if (ft_strstr(line, "||") != NULL)
-		ft_putendl_fd("ft_sh: \"||\" is not allowed", 2);
-	else if (ft_strchr(line, '|') != NULL && check_error_pipe(line) == 0)
-		ft_putendl_fd("ft_sh: pipe without command", 2);
-	else
-		return (1);
-	free(line);
-	return (0);
-}
+	size_t	i;
+	t_arg	*blist;
+	char	**path;
 
-void	sighandler(int signal)
-{
-	if (signal == SIGBUS)
-		ft_putendl_fd("ft_sh: bus error", 2);
-	if (signal == SIGFPE)
-		ft_putendl_fd("ft_sh: floating point exception", 2);
-	if (signal == SIGSEGV)
-		ft_putendl_fd("ft_sh: segmentation fault", 2);
+	i = 0;
+	while (arg && arg[i])
+	{
+		blist = cmd_to_list(arg[i]);
+		if (blist != NULL)
+		{
+			path = ft_strsplit(find_env("PATH"), ':');
+			launch_cmds(blist, NULL, path);
+			ft_freetab(path);
+			lstdel(&blist);
+		}
+		i++;
+	}
 }
 
 void	shell(void)
@@ -142,9 +112,6 @@ void	shell(void)
 	signal(SIGINT, sighandler);
 	signal(SIGQUIT, sighandler);
 	signal(SIGSEGV, sighandler);
-	signal(SIGBUS, sighandler);
-	signal(SIGFPE, sighandler);
-	signal(SIGTSTP, sighandler);
 	ret = -1;
 	while (disp_prompt() && (ret = get_next_line(0, &line)) == 1)
 	{
