@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/21 11:17:16 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/22 17:16:54 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/23 17:03:25 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,35 +35,41 @@ int		open_it(char *file, int redir)
 	return (fd);
 }
 
+char	*join_input_and_line(char *input, char *line)
+{
+	char	*tmp;
+
+	tmp = input;
+	input = ft_strtrijoin(input, line, "\n");
+	free(tmp);
+	free(line);
+	return (input);
+}
+
 char	*get_input(char **stop)
 {
 	int		ret;
 	char	*input;
 	char	*line;
-	char	*tmp;
 	size_t	i;
 
 	i = 0;
-	input = NULL;
-	ret = 1;
+	input = ft_strdup("");
 	while (stop && stop[i])
 	{
-		input = NULL;
+		ret = 1;
 		ft_putstr("> ");
-		while ((ret = get_next_line(0, &line)) == 1 && ft_strequ(line, stop[i]) == 0)
+		while ((ret = get_next_line(0, &line)) == 1
+				&& ft_strequ(line, stop[i]) == 0)
 		{
-			if (ret == -1)
-			{
-				ft_putendl_fd("Error GNL", 2);
-				exit(EXIT_FAILURE);
-			}
-			tmp = input;
-			input = ft_strtrijoin(input, line, "\n");
-			free(tmp);
-			free(line);
+			input = join_input_and_line(input, line);
 			ft_putstr("> ");
 		}
 		free(line);
+		if (ret == 0)
+			ft_putchar('\n');
+		else if (ret == -1)
+			ft_putendl_fd("Error get_next_line", 2);
 		i++;
 	}
 	return (input);
@@ -76,7 +82,7 @@ char	*get_pipe(int old_pdes[2])
 	char	buf[2];
 	int		ret;
 
-	pipe = NULL;
+	pipe = ft_strdup("");
 	close(old_pdes[WRITE_END]);
 	while ((ret = read(old_pdes[READ_END], buf, 1)) != 0)
 	{
@@ -119,26 +125,44 @@ void	put_in_stdin(char *input)
 	close(pdes[READ_END]);
 }
 
-int		cmds_to_output(t_arg *plist, int new_pdes[2], char *input, char *pipe_out)
+int		cmds_to_stdout(t_arg *plist, int new_pdes[2], char *input, char *pip)
 {
-	if (pipe_out != NULL || (plist->left_fd == NULL && plist->stop == NULL))
-		stdin_to_fd(plist, pipe_out);
-	fd_to_fd(plist);
+	int		ret;
+
+	if (pip != NULL || (plist->left_fd == NULL && plist->stop == NULL))
+		ret = stdin_to_output(plist, new_pdes, pip);
+	if (ret >= 128 && ret < 255)
+		return (ret);
+	ret = fd_to_output(plist, new_pdes);
+	if (ret >= 128 && ret < 255)
+		return (ret);
 	if (plist->stop != NULL)
-		input_to_fd(plist, input);
+		ret = input_to_output(plist, input, new_pdes);
+	return (ret);
+}
+
+int		cmds(t_arg *plist, int new_pdes[2], char *input, char *pip)
+{
+	int		ret;
+
 	if (plist->next)
 		if (pipe(new_pdes) == -1)
 		{
 			ft_putendl_fd("Pipe failed", 2);
-			return (-1);
+			return (128);
 		}
+	if (pip != NULL || (plist->left_fd == NULL && plist->stop == NULL))
+		ret = stdin_to_fd(plist, pip);
+	if (ret >= 128 && ret < 255)
+		return (ret);
+	ret = fd_to_fd(plist);
+	if (ret >= 128 && ret < 255)
+		return (ret);
+	if (plist->stop != NULL)
+		ret = input_to_fd(plist, input);
+	if (ret >= 128 && ret < 255)
+		return (ret);
 	if (plist->next || plist->right_fd == NULL)
-	{
-		if (pipe_out != NULL || (plist->left_fd == NULL && plist->stop == NULL))
-			stdin_to_output(plist, new_pdes, pipe_out);
-		fd_to_output(plist, new_pdes);
-		if (plist->stop != NULL)
-			input_to_output(plist, input, new_pdes);
-	}
-	return (1);
+		ret = cmds_to_stdout(plist, new_pdes, input, pip);
+	return (ret);
 }

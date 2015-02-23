@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/23 11:09:53 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/22 19:36:17 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/23 17:22:21 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ extern char **g_env;
 int		disp_prompt(void)
 {
 	char	*dir;
+	char	*tmp;
 
 	dir = NULL;
 	dir = getcwd(dir, 0);
@@ -31,7 +32,8 @@ int		disp_prompt(void)
 	if (ft_strstr(dir, find_env("HOME")))
 	{
 		ft_putstr("~");
-		ft_putstr(ft_strstr(dir, find_env("HOME")) + ft_strlen(find_env("HOME")));
+		tmp = ft_strstr(dir, find_env("HOME")) + ft_strlen(find_env("HOME"));
+		ft_putstr(tmp);
 	}
 	else
 		ft_putstr(dir);
@@ -51,15 +53,13 @@ int		get_exit_status(int status, char *prog)
 	{
 		signum = WTERMSIG(status);
 		if (signum == SIGBUS)
-			ft_putstr_fd("ft_sh: bus error ", 2);
+			ft_miniprintf_fd(2, "ft_sh: bus error %s\n", prog);
 		if (signum == SIGFPE)
-			ft_putstr_fd("ft_sh: floating point exception ", 2);
+			ft_miniprintf_fd(2, "ft_sh: floating point exception %s\n", prog);
 		if (signum == SIGSEGV)
-			ft_putstr_fd("ft_sh: segmentation fault ", 2);
-		ft_putendl_fd(prog, 2);
-		return (-1);
+			ft_miniprintf_fd(2, "ft_sh: segmentation fault %s\n", prog);
+		return (128 + signum);
 	}
-	ft_putendl_fd("Test : idk why child did end", 2);
 	return (0);
 }
 

@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:56:19 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/22 18:54:09 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/23 17:03:10 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,21 @@
 
 typedef struct stat	t_stat;
 
+enum	e_put
+{
+	PIPE, FD, INPUT
+};
+
+typedef struct		s_tools
+{
+	char			*pipe;
+	char			*input;
+	int				fd_in;
+	int				fd_out;
+	enum e_put		in;
+	enum e_put		out;
+}					t_tools;
+
 typedef struct		s_arg
 {
 	char			**arg;
@@ -60,14 +75,18 @@ int					open_it(char *file, int redir);
 char				*get_input(char **stop);
 char				*get_pipe(int old_pdes[2]);
 void				put_in_stdin(char *input);
-int					cmds_to_output(t_arg *plist, int new_pdes[2], char *input, char *pipe_out);
+int					cmds(t_arg *plist, int pdes[2], char *input, char *pip);
 
-void				fd_to_fd(t_arg *plist);
-void				fd_to_output(t_arg *plist, int new_pdes[2]);
-void				input_to_fd(t_arg *plist, char *line);
-void				input_to_output(t_arg *plist, char *line, int new_pdes[2]);
-void				stdin_to_fd(t_arg *plist, char *pipe);
-void				stdin_to_output(t_arg *plist, int new_pdes[2], char *pipe);
+void				child_things(t_arg *plist, int new_pdes[2], t_tools tools);
+int					exec_it(t_arg *plist, int new_pdes[2], t_tools tools);
+t_tools				init_tools(char *pipe, char *input, int fd_in, int fd_out);
+
+int					fd_to_fd(t_arg *plist);
+int					fd_to_output(t_arg *plist, int new_pdes[2]);
+int					input_to_fd(t_arg *plist, char *line);
+int					input_to_output(t_arg *plist, char *line, int new_pdes[2]);
+int					stdin_to_fd(t_arg *plist, char *pipe);
+int					stdin_to_output(t_arg *plist, int new_pdes[2], char *pipe);
 
 t_arg				*cmd_to_list(char *cmd);
 int					is_redir(char *s);
@@ -87,7 +106,7 @@ int					check_error_pipe(char *line);
 int					check_error(char *line);
 void				access_error(int error, char *name);
 int					check_access(char *bin_path);
-int					find_path(char **path, char **arg);
+int					find_path(char **path, char *cmd, char **pathed_cmd);
 
 int					disp_prompt(void);
 int					get_exit_status(int status, char *prog);

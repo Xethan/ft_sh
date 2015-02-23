@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/13 13:22:55 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/22 19:06:35 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/23 17:05:26 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,44 +14,39 @@
 
 extern char	**g_env;
 
-void	fd_to_fd(t_arg *plist)
+int		fd_to_fd(t_arg *plist)
 {
-	pid_t	pid;
+	int		ret;
 	size_t	i;
 	size_t	j;
 	int		lfd;
 	int		rfd;
 
-	i = 0;
-	while (plist->left_fd && plist->left_fd[i])
+	i = -1;
+	while (plist->left_fd && plist->left_fd[++i])
 	{
 		j = 0;
 		while (plist->right_fd && plist->right_fd[j])
 		{
 			if ((rfd = open_it(plist->right_fd[j], WRITE_END)) == -1)
-				return ;
+				return (1);
 			if ((lfd = open_it(plist->left_fd[i], READ_END)) == -1)
-				return ;
-			pid = fork();
-			if (pid > 0)
-				wait(NULL);
-			if (pid == 0)
-			{
-				dup2(lfd, STDIN_FILENO);
-				dup2(rfd, STDOUT_FILENO);
-				execve(plist->arg[0], plist->arg, g_env);
-			}
+				return (1);
+			ret = exec_it(plist, NULL, init_tools(NULL, NULL, lfd, rfd));
 			close(lfd);
 			close(rfd);
+			if (ret >= 126 && ret < 255)
+				return (ret);
 			j++;
 		}
-		i++;
 	}
+	return (ret);
 }
 
-void	fd_to_output(t_arg *plist, int new_pdes[2])
+int		fd_to_output(t_arg *plist, int new_pdes[2])
 {
-	pid_t	pid;
+	t_tools	tools;
+	int		ret;
 	size_t	i;
 	int		fd;
 
@@ -59,32 +54,21 @@ void	fd_to_output(t_arg *plist, int new_pdes[2])
 	while (plist->left_fd && plist->left_fd[i])
 	{
 		if ((fd = open_it(plist->left_fd[i], READ_END)) == -1)
-			return ;
-		pid = fork();
-		if (pid > 0)
-		{
-			wait(NULL);
-			if (plist->next)
-				close(new_pdes[WRITE_END]);
-		}
-		if (pid == 0)
-		{
-			dup2(fd, STDIN_FILENO);
-			if (plist->next)
-			{
-				close(new_pdes[READ_END]);
-				dup2(new_pdes[WRITE_END], STDOUT_FILENO);
-			}
-			execve(plist->arg[0], plist->arg, g_env);
-		}
+			return (1);
+		tools = init_tools(NULL, NULL, fd, -1);
+		ret = exec_it(plist, new_pdes, tools);
 		close(fd);
+		if (ret >= 126 && ret < 255)
+			return (ret);
 		i++;
 	}
+	return (ret);
 }
 
-void	input_to_fd(t_arg *plist, char *line)
+int		input_to_fd(t_arg *plist, char *input)
 {
-	pid_t	pid;
+	t_tools	tools;
+	int		ret;
 	size_t	i;
 	int		fd;
 
@@ -92,40 +76,21 @@ void	input_to_fd(t_arg *plist, char *line)
 	while (plist->right_fd && plist->right_fd[i])
 	{
 		if ((fd = open_it(plist->right_fd[i], WRITE_END)) == -1)
-			return ;
-		pid = fork();
-		if (pid > 0)
-			wait(NULL);
-		if (pid == 0)
-		{
-			put_in_stdin(line);
-			dup2(fd, STDOUT_FILENO);
-			execve(plist->arg[0], plist->arg, g_env);
-		}
+			return (1);
+		tools = init_tools(NULL, input, -1, -1);
+		ret = exec_it(plist, NULL, tools);
 		close(fd);
+		if (ret >= 126 && ret < 255)
+			return (ret);
 		i++;
 	}
+	return (ret);
 }
 
-void	input_to_output(t_arg *plist, char *line, int new_pdes[2])
+int		input_to_output(t_arg *plist, char *input, int new_pdes[2])
 {
-	pid_t	pid;
+	t_tools	tools;
 
-	pid = fork();
-	if (pid > 0)
-	{
-		wait(NULL);
-		if (plist->next)
-			close(new_pdes[WRITE_END]);
-	}
-	if (pid == 0)
-	{
-		put_in_stdin(line);
-		if (plist->next)
-		{
-			close(new_pdes[READ_END]);
-			dup2(new_pdes[WRITE_END], STDOUT_FILENO);
-		}
-		execve(plist->arg[0], plist->arg, g_env);
-	}
+	tools = init_tools(NULL, input, -1, -1);
+	return (exec_it(plist, new_pdes, tools));
 }

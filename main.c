@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:55:27 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/22 17:55:48 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/23 17:22:49 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,12 +33,7 @@ int		built_in(t_arg *plist, int new_pdes[2], char **path)
 	else if (ft_strequ(plist->arg[0], "env"))
 		return (ft_env(plist, new_pdes, path));
 	else if (ft_strequ(plist->arg[0], "setenv"))
-	{
-		if (plist->sz_arg != 1)
-			ft_setenv(plist->arg + 1);
-		else
-			ft_putendl_fd("ft_sh: usage: setenv [name=value ...]", 2);
-	}
+		ft_setenv(plist->arg + 1);
 	else if (ft_strequ(plist->arg[0], "unsetenv"))
 		ft_unsetenv(plist->arg, plist->sz_arg);
 	else
@@ -46,40 +41,49 @@ int		built_in(t_arg *plist, int new_pdes[2], char **path)
 	return (1);
 }
 
+int		recurse(t_arg *plist, int pdes[2], char **path, int ret)
+{
+	if (ret >= 128 && ret < 255)
+	{
+		if (plist->next)
+		{
+			ft_putstr_fd("ft_sh: pipe chaining interrupted by an error ", 2);
+			ft_miniprintf_fd(2, "while executing %s\n", plist->arg[0]);
+		}
+		return (ret);
+	}
+	if (plist->next)
+		ret = launch_cmds(plist->next, pdes, path);
+	return (ret);
+}
+
 int		launch_cmds(t_arg *plist, int old_pdes[2], char **path)
 {
 	int		ret;
 	int		new_pdes[2];
 	char	*input;
-	char	*pipe_out;
+	char	*pip;
 
 	if ((ret = built_in(plist, new_pdes, path)) != 0)
 	{
 		if (plist->next && ret == 1)
-			launch_cmds(plist->next, new_pdes, path);
-		return (1);
+			ret = launch_cmds(plist->next, new_pdes, path);
+		return (ret);
 	}
 	input = NULL;
-	pipe_out = NULL;
-	ret = find_path(path, plist->arg);
-	access_error(ret, plist->arg[0]);
-	if (ret != 1)
-		return (-1);
+	pip = NULL;
 	if (plist->stop != NULL)
 		input = get_input(plist->stop);
 	if (old_pdes != NULL)
 	{
-		pipe_out = get_pipe(old_pdes);
+		pip = get_pipe(old_pdes);
 		close(old_pdes[READ_END]);
 		close(old_pdes[WRITE_END]);
 	}
-	if (cmds_to_output(plist, new_pdes, input, pipe_out) == -1)
-		return (-1);
+	ret = cmds(plist, new_pdes, input, pip);
 	free(input);
-	free(pipe_out);
-	if (plist->next)
-		launch_cmds(plist->next, new_pdes, path);
-	return (1);
+	free(pip);
+	return (recurse(plist, new_pdes, path, ret));
 }
 
 void	cmd_to_list_and_exec(char **arg)

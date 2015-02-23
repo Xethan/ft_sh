@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/12 15:32:34 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/22 16:41:38 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/23 17:09:27 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,8 @@ int		ft_setenv(char **arg)
 		free(name);
 		i++;
 	}
+	if (i == 0)
+		ft_putendl_fd("usage: setenv [name=value ...]", 2);
 	return (1);
 }
 

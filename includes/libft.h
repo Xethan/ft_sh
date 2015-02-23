@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/04 13:57:05 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/22 16:34:35 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/23 14:54:53 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,8 @@ void				*ft_memcpy(void *dst, const void *src, size_t n);
 void				ft_memdel(void **ap);
 void				*ft_memmove(void *dst, const void *src, size_t len);
 void				*ft_memset(void *b, int c, size_t len);
+int					ft_miniprintf(const char *arg, ...);
+int					ft_miniprintf_fd(int fd, const char *arg, ...);
 size_t				ft_nbrlen(int n);
 void				ft_putchar(char c);
 void				ft_putchar_fd(char c, int fd);

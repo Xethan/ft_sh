@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/22 16:26:08 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/22 18:54:29 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/23 17:14:11 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,10 @@
 
 extern char **g_env;
 
-void	stdin_to_fd(t_arg *plist, char *pipe)
+int		stdin_to_fd(t_arg *plist, char *pipe)
 {
-	pid_t	pid;
+	t_tools	tools;
+	int		ret;
 	size_t	i;
 	int		fd;
 
@@ -24,54 +25,21 @@ void	stdin_to_fd(t_arg *plist, char *pipe)
 	while (plist->right_fd && plist->right_fd[i])
 	{
 		if ((fd = open_it(plist->right_fd[i], WRITE_END)) == -1)
-			return ;
-		pid = fork();
-		if (pid == -1)
-			ft_putendl_fd("ft_sh: fork failed", 2);
-		if (pid > 0)
-			wait(NULL);
-		if (pid == 0)
-		{
-			if (pipe != NULL)
-				put_in_stdin(pipe);
-			dup2(fd, STDOUT_FILENO);
-			execve(plist->arg[0], plist->arg, g_env);
-			ft_putstr_fd("ft_sh: exec format error: ", 2);
-			ft_putendl_fd(plist->arg[0], 2);
-			exit(EXIT_FAILURE);
-		}
+			return (1);
+		tools = init_tools(pipe, NULL, -1, fd);
+		ret = exec_it(plist, NULL, tools);
 		close(fd);
+		if (ret >= 126 && ret < 255)
+			return (ret);
 		i++;
 	}
+	return (ret);
 }
 
-void	stdin_to_output(t_arg *plist, int new_pdes[2], char *pipe)
+int		stdin_to_output(t_arg *plist, int new_pdes[2], char *pipe)
 {
-	pid_t	pid;
-	int		status;
+	t_tools	tools;
 
-	pid = fork();
-	if (pid == -1)
-		ft_putendl_fd("ft_sh: fork failed", 2);
-	if (pid > 0)
-	{
-		wait(&status);
-		if (plist->next)
-			close(new_pdes[WRITE_END]);
-		get_exit_status(status, plist->arg[0]);
-	}
-	if (pid == 0)
-	{
-		if (pipe != NULL)
-			put_in_stdin(pipe);
-		if (plist->next)
-		{
-			close(new_pdes[READ_END]);
-			dup2(new_pdes[WRITE_END], STDOUT_FILENO);
-		}
-		execve(plist->arg[0], plist->arg, g_env);
-		ft_putstr_fd("ft_sh: exec format error: ", 2);
-		ft_putendl_fd(plist->arg[0], 2);
-		exit(EXIT_FAILURE);
-	}
+	tools = init_tools(pipe, NULL, -1, -1);
+	return (exec_it(plist, new_pdes, tools));
 }

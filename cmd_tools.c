@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/08 16:16:26 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/18 18:38:17 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/23 16:04:30 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,24 +48,19 @@ char	**tilde_and_dollar(char **cmd, size_t sz_cmd)
 	i = 0;
 	while (i != sz_cmd)
 	{
+		tmp = cmd[i];
 		if (find_env("HOME") != NULL)
 			if (cmd[i][0] == '~' && (cmd[i][1] == '\0' || cmd[i][1] == '/'))
-			{
-				tmp = cmd[i];
 				cmd[i] = ft_strjoin(find_env("HOME"), cmd[i] + 1);
-				free(tmp);
-			}
 		if (cmd[i][0] == '$')
 		{
 			var = ft_strcdup(cmd[i] + 1, '/');
 			if (find_env(var) != NULL)
-			{
-				tmp = cmd[i];
 				cmd[i] = ft_strjoin(find_env(var), cmd[i] + ft_strlen(var) + 1);
-				free(tmp);
-			}
 			free(var);
 		}
+		if (ft_strequ(cmd[i], tmp) == 0)
+			free(tmp);
 		i++;
 	}
 	return (cmd);
