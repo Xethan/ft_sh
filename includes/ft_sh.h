@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:56:19 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/23 17:03:10 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/24 12:26:15 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,6 @@ int					open_it(char *file, int redir);
 char				*get_input(char **stop);
 char				*get_pipe(int old_pdes[2]);
 void				put_in_stdin(char *input);
-int					cmds(t_arg *plist, int pdes[2], char *input, char *pip);
 
 void				child_things(t_arg *plist, int new_pdes[2], t_tools tools);
 int					exec_it(t_arg *plist, int new_pdes[2], t_tools tools);
@@ -105,13 +104,16 @@ int					nb_env(char *to_find);
 int					check_error_pipe(char *line);
 int					check_error(char *line);
 void				access_error(int error, char *name);
-int					check_access(char *bin_path);
-int					find_path(char **path, char *cmd, char **pathed_cmd);
 
 int					disp_prompt(void);
 int					get_exit_status(int status, char *prog);
 void				sighandler(int signal);
 void				up_shlvl(void);
 void				lstdel(t_arg **begin_list);
+
+int					built_in(t_arg *plist, int new_pdes[2], char **path);
+int					cmds(t_arg *plist, int new_pdes[2], char *input, char *pip);
+int					check_access(char *full_path);
+int					find_path(char **path, char *cmd, char **pathed_cmd);
 
 #endif

@@ -6,40 +6,13 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:55:27 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/23 17:22:49 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/24 12:20:03 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_sh.h"
 
 char	**g_env;
-
-int		built_in(t_arg *plist, int new_pdes[2], char **path)
-{
-	int		exit_value;
-
-	if (ft_strequ(plist->arg[0], "exit"))
-	{
-		free_env();
-		if (plist->sz_arg > 1)
-			exit_value = ft_atoi(plist->arg[1]);
-		else
-			exit_value = 0;
-		lstdel(&plist);
-		exit(exit_value);
-	}
-	if (ft_strequ(plist->arg[0], "cd"))
-		change_dir(plist->arg, plist->sz_arg);
-	else if (ft_strequ(plist->arg[0], "env"))
-		return (ft_env(plist, new_pdes, path));
-	else if (ft_strequ(plist->arg[0], "setenv"))
-		ft_setenv(plist->arg + 1);
-	else if (ft_strequ(plist->arg[0], "unsetenv"))
-		ft_unsetenv(plist->arg, plist->sz_arg);
-	else
-		return (0);
-	return (1);
-}
 
 int		recurse(t_arg *plist, int pdes[2], char **path, int ret)
 {

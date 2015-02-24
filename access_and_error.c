@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/04 13:15:47 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/23 15:59:03 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/24 12:19:55 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,56 +90,4 @@ void	access_error(int error, char *name)
 	}
 	if (error == 126 || error == 127)
 		ft_putendl_fd(name, 2);
-}
-
-int		check_access(char *full_path)
-{
-	char	*bin_path;
-	int		i;
-	int		ret;
-	t_stat	st;
-	t_stat	st2;
-
-	i = 0;
-	ret = 0;
-	while (full_path[i])
-		i++;
-	while (full_path[i] != '/' && i != 0)
-		i--;
-	bin_path = ft_strndup(full_path, i);
-	if (i != 0 && stat(bin_path, &st) == -1)
-		ret = 127;
-	else if (i != 0 && access(bin_path, R_OK) == -1)
-		ret = 126;
-	else if (stat(full_path, &st2) == -1)
-		ret = 127;
-	else if (S_ISREG(st2.st_mode) == 0 || access(full_path, X_OK) == -1)
-		ret = 126;
-	free(bin_path);
-	return (ret);
-}
-
-int		find_path(char **path, char *cmd, char **pathed_cmd)
-{
-	size_t	i;
-	char	*tmp;
-	int		ret;
-
-	if (cmd[0] != '.' && cmd[0] != '/')
-	{
-		i = 0;
-		while (path && path[i])
-		{
-			tmp = ft_strtrijoin(path[i], "/", cmd);
-			if ((ret = check_access(tmp)) == 0)
-				*pathed_cmd = ft_strdup(tmp);
-			free(tmp);
-			if (ret == 0 || ret == 126)
-				return (ret);
-			i++;
-		}
-		return (127);
-	}
-	*pathed_cmd = ft_strdup(cmd);
-	return (check_access(cmd));
 }

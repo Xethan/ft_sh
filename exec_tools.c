@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/21 11:17:16 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/23 17:03:25 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/24 12:21:15 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,46 +123,4 @@ void	put_in_stdin(char *input)
 		exit(EXIT_SUCCESS);
 	}
 	close(pdes[READ_END]);
-}
-
-int		cmds_to_stdout(t_arg *plist, int new_pdes[2], char *input, char *pip)
-{
-	int		ret;
-
-	if (pip != NULL || (plist->left_fd == NULL && plist->stop == NULL))
-		ret = stdin_to_output(plist, new_pdes, pip);
-	if (ret >= 128 && ret < 255)
-		return (ret);
-	ret = fd_to_output(plist, new_pdes);
-	if (ret >= 128 && ret < 255)
-		return (ret);
-	if (plist->stop != NULL)
-		ret = input_to_output(plist, input, new_pdes);
-	return (ret);
-}
-
-int		cmds(t_arg *plist, int new_pdes[2], char *input, char *pip)
-{
-	int		ret;
-
-	if (plist->next)
-		if (pipe(new_pdes) == -1)
-		{
-			ft_putendl_fd("Pipe failed", 2);
-			return (128);
-		}
-	if (pip != NULL || (plist->left_fd == NULL && plist->stop == NULL))
-		ret = stdin_to_fd(plist, pip);
-	if (ret >= 128 && ret < 255)
-		return (ret);
-	ret = fd_to_fd(plist);
-	if (ret >= 128 && ret < 255)
-		return (ret);
-	if (plist->stop != NULL)
-		ret = input_to_fd(plist, input);
-	if (ret >= 128 && ret < 255)
-		return (ret);
-	if (plist->next || plist->right_fd == NULL)
-		ret = cmds_to_stdout(plist, new_pdes, input, pip);
-	return (ret);
 }
