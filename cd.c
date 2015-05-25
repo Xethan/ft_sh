@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/12 15:37:27 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/18 16:54:20 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/24 13:13:01 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,9 +65,22 @@ void	chdir_me(char *target)
 	ft_putendl_fd(target, 2);
 }
 
-void	change_dir(char **arg, size_t sz_arg)
+int		ft_strtablen(char **tab)
 {
-	if (sz_arg == 1 || ft_strequ(arg[1], "--"))
+	int		size;
+
+	size = 0;
+	while (tab && tab[size])
+		size++;
+	return (size);
+}
+
+void	change_dir(char **arg)
+{
+	int		size_arg;
+
+	size_arg = ft_strtablen(arg);
+	if (size_arg == 1 || ft_strequ(arg[1], "--"))
 		chdir_me(find_env("HOME"));
 	else if (ft_strequ(arg[1], "-"))
 	{
@@ -75,12 +88,12 @@ void	change_dir(char **arg, size_t sz_arg)
 			ft_putendl(find_env("OLDPWD"));
 		chdir_me(find_env("OLDPWD"));
 	}
-	else if (sz_arg == 3)
+	else if (size_arg == 3)
 	{
 		ft_putstr_fd("cd: string not in pwd: ", 2);
 		ft_putendl_fd(arg[1], 2);
 	}
-	else if (sz_arg >= 4)
+	else if (size_arg >= 4)
 		ft_putendl_fd("cd: too many arguments", 2);
 	else
 		chdir_me(arg[1]);

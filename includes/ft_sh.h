@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:56:19 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/24 12:26:15 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/24 16:35:21 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ typedef struct		s_tools
 
 typedef struct		s_arg
 {
+	char			*cmd;
 	char			**arg;
 	size_t			sz_arg;
 	char			**left_fd;
@@ -76,8 +77,9 @@ char				*get_input(char **stop);
 char				*get_pipe(int old_pdes[2]);
 void				put_in_stdin(char *input);
 
-void				child_things(t_arg *plist, int new_pdes[2], t_tools tools);
-int					exec_it(t_arg *plist, int new_pdes[2], t_tools tools);
+int					recurse(t_arg *plist, int pdes[2], char **path, int ret);
+void				child_things(t_arg *plist, int pdes[2], t_tools tools);
+int					fork_exec(t_arg *plist, int pdes[2], t_tools tools);
 t_tools				init_tools(char *pipe, char *input, int fd_in, int fd_out);
 
 int					fd_to_fd(t_arg *plist);
@@ -93,7 +95,7 @@ char				*replace_tabs(char *line);
 char				**tilde_and_dollar(char **cmd, size_t sz_cmd);
 
 void				chdir_me(char *target);
-void				change_dir(char **arg, size_t sz_arg);
+void				change_dir(char **arg);
 
 char				**dup_env(char **env);
 void				free_env(void);

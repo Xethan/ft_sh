@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/21 11:17:16 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/24 12:21:15 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/24 13:59:23 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,13 +84,8 @@ char	*get_pipe(int old_pdes[2])
 
 	pipe = ft_strdup("");
 	close(old_pdes[WRITE_END]);
-	while ((ret = read(old_pdes[READ_END], buf, 1)) != 0)
+	while ((ret = read(old_pdes[READ_END], buf, 1)) != 0 && ret != -1)
 	{
-		if (ret == -1)
-		{
-			ft_putendl_fd("Error GNL", 2);
-			exit(EXIT_FAILURE);
-		}
 		buf[1] = '\0';
 		tmp = pipe;
 		pipe = ft_strjoin(pipe, buf);

@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/13 13:22:55 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/23 17:05:26 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/24 13:26:39 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ int		fd_to_fd(t_arg *plist)
 				return (1);
 			if ((lfd = open_it(plist->left_fd[i], READ_END)) == -1)
 				return (1);
-			ret = exec_it(plist, NULL, init_tools(NULL, NULL, lfd, rfd));
+			ret = fork_exec(plist, NULL, init_tools(NULL, NULL, lfd, rfd));
 			close(lfd);
 			close(rfd);
 			if (ret >= 126 && ret < 255)
@@ -56,7 +56,7 @@ int		fd_to_output(t_arg *plist, int new_pdes[2])
 		if ((fd = open_it(plist->left_fd[i], READ_END)) == -1)
 			return (1);
 		tools = init_tools(NULL, NULL, fd, -1);
-		ret = exec_it(plist, new_pdes, tools);
+		ret = fork_exec(plist, new_pdes, tools);
 		close(fd);
 		if (ret >= 126 && ret < 255)
 			return (ret);
@@ -78,7 +78,7 @@ int		input_to_fd(t_arg *plist, char *input)
 		if ((fd = open_it(plist->right_fd[i], WRITE_END)) == -1)
 			return (1);
 		tools = init_tools(NULL, input, -1, -1);
-		ret = exec_it(plist, NULL, tools);
+		ret = fork_exec(plist, NULL, tools);
 		close(fd);
 		if (ret >= 126 && ret < 255)
 			return (ret);
@@ -92,5 +92,5 @@ int		input_to_output(t_arg *plist, char *input, int new_pdes[2])
 	t_tools	tools;
 
 	tools = init_tools(NULL, input, -1, -1);
-	return (exec_it(plist, new_pdes, tools));
+	return (fork_exec(plist, new_pdes, tools));
 }

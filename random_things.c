@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/24 12:20:53 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/24 12:22:26 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/05/25 13:59:13 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,15 +21,15 @@ int		built_in(t_arg *plist, int new_pdes[2], char **path)
 	if (ft_strequ(plist->arg[0], "exit"))
 	{
 		free_env();
-		if (plist->sz_arg > 1)
+		if (plist->arg[1])
 			exit_value = ft_atoi(plist->arg[1]);
 		else
 			exit_value = 0;
-		lstdel(&plist);
+		exit_value = (exit_value > 255 || exit_value < 0) ? 255 : exit_value;
 		exit(exit_value);
 	}
 	if (ft_strequ(plist->arg[0], "cd"))
-		change_dir(plist->arg, plist->sz_arg);
+		change_dir(plist->arg);
 	else if (ft_strequ(plist->arg[0], "env"))
 		return (ft_env(plist, new_pdes, path));
 	else if (ft_strequ(plist->arg[0], "setenv"))
@@ -45,6 +45,7 @@ int		cmds_to_stdout(t_arg *plist, int new_pdes[2], char *input, char *pip)
 {
 	int		ret;
 
+	ret = 0;
 	if (pip != NULL || (plist->left_fd == NULL && plist->stop == NULL))
 		ret = stdin_to_output(plist, new_pdes, pip);
 	if (ret >= 128 && ret < 255)
@@ -61,12 +62,7 @@ int		cmds(t_arg *plist, int new_pdes[2], char *input, char *pip)
 {
 	int		ret;
 
-	if (plist->next)
-		if (pipe(new_pdes) == -1)
-		{
-			ft_putendl_fd("Pipe failed", 2);
-			return (128);
-		}
+	ret = 0;
 	if (pip != NULL || (plist->left_fd == NULL && plist->stop == NULL))
 		ret = stdin_to_fd(plist, pip);
 	if (ret >= 128 && ret < 255)

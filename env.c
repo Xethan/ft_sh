@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/18 16:12:29 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/22 17:37:38 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/24 13:04:22 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,11 +99,12 @@ int		treat_options(t_arg *plist)
 			add_to_env = ft_realloc_str_tab(add_to_env, plist->arg[i]);
 			i++;
 		}
-		if (ft_setenv(add_to_env) == 0)
-		{
-			ft_freetab(add_to_env);
-			return (-1);
-		}
+		if (add_to_env)
+			if (ft_setenv(add_to_env) == 0)
+			{
+				ft_freetab(add_to_env);
+				return (-1);
+			}
 		ft_freetab(add_to_env);
 	}
 	return (i);
@@ -116,10 +117,11 @@ int		ft_env(t_arg *plist, int new_pdes[2], char **path)
 
 	tmp_env = dup_env(g_env);
 	i = treat_options(plist);
-	if (plist->arg[i])
+	if (i != -1 && plist->arg[i])
 	{
 		plist->arg += i;
 		launch_cmds(plist, NULL, path);
+		plist->arg -= i;
 		free_env();
 		g_env = tmp_env;
 		return (2);

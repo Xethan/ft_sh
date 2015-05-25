@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/07 12:55:27 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/24 12:20:03 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/25 15:19:25 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,20 +14,14 @@
 
 char	**g_env;
 
-int		recurse(t_arg *plist, int pdes[2], char **path, int ret)
+void	get_input_and_pip(t_arg *plist, int pdes[2], char **input, char **pip)
 {
-	if (ret >= 128 && ret < 255)
-	{
-		if (plist->next)
-		{
-			ft_putstr_fd("ft_sh: pipe chaining interrupted by an error ", 2);
-			ft_miniprintf_fd(2, "while executing %s\n", plist->arg[0]);
-		}
-		return (ret);
-	}
-	if (plist->next)
-		ret = launch_cmds(plist->next, pdes, path);
-	return (ret);
+	*input = NULL;
+	*pip = NULL;
+	if (plist->stop != NULL)
+		*input = get_input(plist->stop);
+	if (pdes != NULL)
+		*pip = get_pipe(pdes);
 }
 
 int		launch_cmds(t_arg *plist, int old_pdes[2], char **path)
@@ -43,15 +37,15 @@ int		launch_cmds(t_arg *plist, int old_pdes[2], char **path)
 			ret = launch_cmds(plist->next, new_pdes, path);
 		return (ret);
 	}
-	input = NULL;
-	pip = NULL;
-	if (plist->stop != NULL)
-		input = get_input(plist->stop);
-	if (old_pdes != NULL)
+	ret = find_path(path, plist->arg[0], &(plist->cmd));
+	access_error(ret, plist->arg[0]);
+	if (ret != 0)
+		return (ret);
+	get_input_and_pip(plist, old_pdes, &input, &pip);
+	if (plist->next && pipe(new_pdes) == -1)
 	{
-		pip = get_pipe(old_pdes);
-		close(old_pdes[READ_END]);
-		close(old_pdes[WRITE_END]);
+		ft_putendl_fd("Pipe failed", 2);
+		return (128);
 	}
 	ret = cmds(plist, new_pdes, input, pip);
 	free(input);
@@ -88,7 +82,6 @@ void	shell(void)
 
 	signal(SIGINT, sighandler);
 	signal(SIGQUIT, sighandler);
-	signal(SIGSEGV, sighandler);
 	ret = -1;
 	while (disp_prompt() && (ret = get_next_line(0, &line)) == 1)
 	{

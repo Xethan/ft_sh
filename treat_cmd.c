@@ -6,7 +6,7 @@
 /*   By: ncolliau <ncolliau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/28 15:01:51 by ncolliau          #+#    #+#             */
-/*   Updated: 2015/02/22 16:24:40 by ncolliau         ###   ########.fr       */
+/*   Updated: 2015/02/24 13:23:49 by ncolliau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,7 @@ t_arg	*cmd_to_node(char *cmd)
 	char	*newline;
 
 	node = (t_arg *)malloc(sizeof(t_arg));
+	node->cmd = NULL;
 	node->left_fd = NULL;
 	node->right_fd = NULL;
 	node->stop = NULL;
